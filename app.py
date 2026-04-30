@@ -164,6 +164,34 @@ def lamaran_landing():
     """Landing page khusus lamaran kerja"""
     return render_template('lamaran.html')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """Sitemap XML buat Google Search Console"""
+    pages = [
+        {'loc': 'https://kompresin.my.id/', 'priority': '1.0', 'changefreq': 'weekly'},
+        {'loc': 'https://kompresin.my.id/cpns', 'priority': '0.9', 'changefreq': 'monthly'},
+        {'loc': 'https://kompresin.my.id/lamaran-kerja', 'priority': '0.9', 'changefreq': 'monthly'},
+    ]
+    
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for page in pages:
+        xml += f'  <url>\n'
+        xml += f'    <loc>{page["loc"]}</loc>\n'
+        xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
+        xml += f'    <priority>{page["priority"]}</priority>\n'
+        xml += f'  </url>\n'
+    xml += '</urlset>'
+    
+    return xml, 200, {'Content-Type': 'application/xml'}
+
+
+@app.route('/robots.txt')
+def robots():
+    """Robots.txt buat ngasih tau Google sitemap-nya dimana"""
+    content = "User-agent: *\nAllow: /\n\nSitemap: https://kompresin.my.id/sitemap.xml\n"
+    return content, 200, {'Content-Type': 'text/plain'}
+
 
 @app.errorhandler(413)
 def too_large(e):
