@@ -10,7 +10,8 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB max upload
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max upload
+# app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB max upload
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['COMPRESSED_FOLDER'] = 'compressed'
 
@@ -193,10 +194,13 @@ def robots():
     return content, 200, {'Content-Type': 'text/plain'}
 
 
+# @app.errorhandler(413)
+# def too_large(e):
+    # return jsonify({'error': 'File kegedean (max 20MB)'}), 413
 @app.errorhandler(413)
 def too_large(e):
-    return jsonify({'error': 'File kegedean (max 20MB)'}), 413
-
+    # Ubah teks 20MB jadi 5MB biar user gak bingung
+    return jsonify({'error': 'File kegedean (max 5MB)'}), 413
 
 
 # Pastiin folder ada (jalan baik di local maupun production)
