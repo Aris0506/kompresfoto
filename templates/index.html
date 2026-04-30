@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KompresFoto.id - Kompres Foto Sesuai Target KB | Buat CPNS, Lamaran Kerja</title>
+    <meta name="description" content="Kompres foto JPG/PNG sesuai target ukuran KB. Cocok buat upload CPNS, lamaran kerja, daftar sekolah. Gratis, tanpa watermark, hasil sesuai target.">
+    <meta name="keywords" content="kompres foto, kompres foto online, kompres foto cpns, kompres foto 200kb, kompres foto lamaran kerja">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    <!-- AdSense placeholder - aktifin nanti setelah approve -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXX" crossorigin="anonymous"></script> -->
+</head>
+<body>
+    <!-- Top nav -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-image-fill text-primary"></i> KompresFoto<span class="text-primary">.id</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/cpns">Buat CPNS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/lamaran-kerja">Lamaran Kerja</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#cara-pakai">Cara Pakai</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 text-center text-lg-start">
+                    <h1 class="display-5 fw-bold mb-3">Kompres Foto Sesuai Target KB <span class="text-primary">Tanpa Ribet</span></h1>
+                    <p class="lead text-muted">Upload foto, set target ukuran (200KB, 500KB, 1MB...), download. Pas buat upload CPNS, lamaran kerja, daftar sekolah. <strong>Gratis & gak ada watermark.</strong></p>
+                    <div class="d-flex gap-2 justify-content-center justify-content-lg-start flex-wrap mt-3">
+                        <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Hasil sesuai target</span>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Tanpa watermark</span>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Aman & private</span>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block text-center">
+                    <i class="bi bi-image-alt text-primary" style="font-size: 10rem; opacity: 0.15;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main tool -->
+    <section class="py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4 p-md-5">
+                            
+                            <!-- Upload area -->
+                            <div id="uploadZone" class="upload-zone text-center p-5 mb-4">
+                                <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                                <h4 class="mb-2">Drop foto di sini atau klik untuk pilih</h4>
+                                <p class="text-muted mb-0">JPG, PNG, WebP — Max 20MB</p>
+                                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/bmp" hidden>
+                            </div>
+
+                            <!-- Preview file -->
+                            <div id="filePreview" class="d-none mb-4">
+                                <div class="alert alert-light border d-flex align-items-center">
+                                    <i class="bi bi-file-image text-primary fs-3 me-3"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold" id="fileName">-</div>
+                                        <small class="text-muted" id="fileSize">-</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" id="removeFile">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Target size -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Target Ukuran File</label>
+                                <div class="input-group input-group-lg">
+                                    <input type="number" class="form-control" id="targetKb" value="200" min="10" max="5000">
+                                    <span class="input-group-text">KB</span>
+                                </div>
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <button class="btn btn-sm btn-outline-secondary preset" data-kb="100">100 KB</button>
+                                    <button class="btn btn-sm btn-outline-secondary preset" data-kb="200">200 KB</button>
+                                    <button class="btn btn-sm btn-outline-secondary preset" data-kb="300">300 KB</button>
+                                    <button class="btn btn-sm btn-outline-secondary preset" data-kb="500">500 KB</button>
+                                    <button class="btn btn-sm btn-outline-secondary preset" data-kb="1000">1 MB</button>
+                                    <button class="btn btn-sm btn-outline-secondary preset" data-kb="2000">2 MB</button>
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle"></i> CPNS biasanya 200KB, lamaran kerja 500KB-1MB
+                                </small>
+                            </div>
+
+                            <!-- Action button -->
+                            <button class="btn btn-primary btn-lg w-100" id="compressBtn" disabled>
+                                <i class="bi bi-magic"></i> Kompres Sekarang
+                            </button>
+
+                            <!-- Loading -->
+                            <div id="loadingState" class="d-none text-center py-4">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-3 mb-0">Lagi proses... bentar ya</p>
+                            </div>
+
+                            <!-- Result -->
+                            <div id="resultState" class="d-none mt-4">
+                                <div class="alert alert-success border-0">
+                                    <h5 class="alert-heading"><i class="bi bi-check-circle-fill"></i> Sukses!</h5>
+                                    <div class="row text-center mt-3">
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Sebelum</small>
+                                            <strong id="resultOriginal">-</strong>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Sesudah</small>
+                                            <strong id="resultFinal" class="text-success">-</strong>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Hemat</small>
+                                            <strong id="resultReduction" class="text-primary">-</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
+                                    <i class="bi bi-download"></i> Download Hasil
+                                </a>
+                                <button class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
+                                    <i class="bi bi-arrow-clockwise"></i> Kompres Foto Lain
+                                </button>
+                            </div>
+
+                            <!-- Error -->
+                            <div id="errorState" class="alert alert-danger d-none mt-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Ad slot setelah hasil keluar (best practice: gak ganggu UX) -->
+                    <div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
+                        <small class="text-muted d-block mb-2">Iklan</small>
+                        <!-- Pasang AdSense unit di sini -->
+                        <div class="text-muted py-4">[ Ad Placement ]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cara pakai (good for SEO) -->
+    <section class="py-5 bg-light" id="cara-pakai">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Cara Kompres Foto</h2>
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="step-circle">1</div>
+                    <h5 class="mt-3">Upload Foto</h5>
+                    <p class="text-muted">Pilih foto JPG, PNG, atau WebP dari device lo. Max 20MB.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="step-circle">2</div>
+                    <h5 class="mt-3">Set Target KB</h5>
+                    <p class="text-muted">Masukin target ukuran file (misal 200KB buat CPNS).</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="step-circle">3</div>
+                    <h5 class="mt-3">Download</h5>
+                    <p class="text-muted">Klik tombol kompres, tunggu sebentar, langsung download.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ buat SEO -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="fw-bold mb-4">Pertanyaan yang Sering Ditanya</h2>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Apakah kompres foto ini gratis?
+                                </button>
+                            </h3>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Ya, 100% gratis tanpa batasan jumlah foto yang bisa dikompres.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Apakah foto saya aman?
+                                </button>
+                            </h3>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Foto otomatis dihapus dari server setelah diproses. Kami tidak menyimpan atau membagikan foto apapun.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Berapa ukuran maksimal foto yang bisa diupload?
+                                </button>
+                            </h3>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Maksimal 20MB per foto. Format yang didukung: JPG, JPEG, PNG, WebP, BMP.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Kenapa hasil kompres kadang lebih kecil dari target?
+                                </button>
+                            </h3>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Sistem akan mencari kualitas terbaik yang ukurannya sama atau di bawah target lo. Ini bagus karena kualitas foto tetap maksimal sambil tetap memenuhi syarat upload.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 border-top bg-white">
+        <div class="container text-center text-muted">
+            <small>© 2026 KompresFoto.id — Tools gratis buat lo</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
