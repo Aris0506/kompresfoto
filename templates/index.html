@@ -78,19 +78,26 @@
                                 <p class="text-muted mb-0">JPG, PNG, WebP — Max 5MB</p>
                                 <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/bmp" hidden>
                             </div>
-                            
-                            <!-- Adsterra Native Banner -->
-                            <section class="py-4">
-                                <div class="container">
-                                    <div class="row justify-content-center">
-                                        <div class="col-lg-8">
-                                            <small class="text-muted text-center d-block mb-2">Iklan</small>
-                                            <script async="async" data-cfasync="false" src="//pl29301197.profitablecpmratenetwork.com/62c9df870437eccf9ac954b7f77fdbfc/invoke.js"></script>
-                                            <div id="container-62c9df870437eccf9ac954b7f77fdbfc"></div>
-                                        </div>
-                                    </div>
+
+                            <!-- Ad slot setelah hasil keluar (best practice: gak ganggu UX) -->
+                            <!-- Ad slot setelah hasil keluar (best practice: gak ganggu UX) -->
+                            <div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
+                                <small class="text-muted d-block mb-2">Iklan</small>
+                                <!-- Adsterra Banner 300x250 -->
+                                <div style="display: flex; justify-content: center;">
+                                    <script type="text/javascript">
+                                        atOptions = {
+                                            'key' : 'd4c1966bed2135f18595a1ed7645db4b',
+                                            'format' : 'iframe',
+                                            'height' : 250,
+                                            'width' : 300,
+                                            'params' : {}
+                                        };
+                                    </script>
+                                    <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
                                 </div>
-                            </section>
+                            </div>   
+                            
                             <!-- Preview file -->
                             <div id="filePreview" class="d-none mb-4">
                                 <div class="alert alert-light border d-flex align-items-center">
@@ -168,24 +175,18 @@
                         </div>
                     </div>
 
-                    <!-- Ad slot setelah hasil keluar (best practice: gak ganggu UX) -->
-                    <!-- Ad slot setelah hasil keluar (best practice: gak ganggu UX) -->
-                    <div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
-                        <small class="text-muted d-block mb-2">Iklan</small>
-                        <!-- Adsterra Banner 300x250 -->
-                        <div style="display: flex; justify-content: center;">
-                            <script type="text/javascript">
-                                atOptions = {
-                                    'key' : 'd4c1966bed2135f18595a1ed7645db4b',
-                                    'format' : 'iframe',
-                                    'height' : 250,
-                                    'width' : 300,
-                                    'params' : {}
-                                };
-                            </script>
-                            <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
+                    <!-- Adsterra Native Banner -->
+                    <section class="py-4">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <small class="text-muted text-center d-block mb-2">Iklan</small>
+                                    <script async="async" data-cfasync="false" src="//pl29301197.profitablecpmratenetwork.com/62c9df870437eccf9ac954b7f77fdbfc/invoke.js"></script>
+                                    <div id="container-62c9df870437eccf9ac954b7f77fdbfc"></div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
