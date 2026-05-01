@@ -1,83 +1,153 @@
 {% extends "base.html" %}
 
-{% block title %}Kompresin.my.id - Tools Foto & PDF Online Gratis | Gampangin File Kamu{% endblock %}
-{% block description %}Kompresin.my.id - Semua tools yang lo butuh dalam 1 tempat: kompres foto, ganti background, bikin pas foto, kompres PDF. Gratis, gak ribet, tanpa watermark.{% endblock %}
+{% block title %}Kompresin.my.id - Kompres Foto Online Sesuai Target KB | CPNS & Lamaran Kerja{% endblock %}
+{% block description %}Kompresin.my.id - Kompres foto online sesuai target KB (200KB, 500KB, 1MB). Cocok buat upload CPNS, lamaran kerja, daftar sekolah. Gratis tanpa watermark.{% endblock %}
 
 {% block content %}
-<!-- Hero + Smart Upload -->
-<section class="hero-smart py-5">
+<!-- Hero -->
+<section class="hero py-5">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-9 text-center">
-                <h1 class="display-5 fw-bold mb-2">Gampangin File Kamu, <span class="text-primary">Sekali Klik</span></h1>
-                <p class="lead text-muted mb-4">Drop foto atau PDF di bawah ini — kita kasih semua opsi yang lo butuh.</p>
-                
-                <!-- Smart Upload Zone -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4 p-md-5">
-                        <div id="smartUploadZone" class="upload-zone-large">
-                            <i class="bi bi-cloud-upload text-primary mb-3" style="font-size: 4rem;"></i>
-                            <h3 class="mb-2">Drop file di sini atau klik untuk pilih</h3>
-                            <p class="text-muted mb-0">Foto (JPG, PNG, WebP) atau PDF — Max 20MB</p>
-                            <input type="file" id="smartFileInput" accept="image/jpeg,image/png,image/webp,image/bmp,application/pdf" hidden>
-                        </div>
-
-                        <!-- File detected -> opsi muncul -->
-                        <div id="smartOptions" class="d-none mt-4">
-                            <div class="alert alert-light border d-flex align-items-center mb-3">
-                                <i class="bi bi-file-earmark-check text-success fs-3 me-3"></i>
-                                <div class="flex-grow-1 text-start">
-                                    <div class="fw-semibold" id="detectedFileName">-</div>
-                                    <small class="text-muted" id="detectedFileSize">-</small>
-                                </div>
-                                <button class="btn btn-sm btn-outline-secondary" id="resetSmart">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                            
-                            <h5 class="mb-3 text-start">Mau lo lakuin apa?</h5>
-                            <div class="row g-3" id="smartOptionsList">
-                                <!-- diisi via JS sesuai hasil detect -->
-                            </div>
-                        </div>
-                    </div>
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-5 fw-bold mb-3">Kompres Foto Sesuai Target KB <span class="text-primary">Tanpa Ribet</span></h1>
+                <p class="lead text-muted">Upload foto, set target ukuran (200KB, 500KB, 1MB...), download. Pas buat upload CPNS, lamaran kerja, daftar sekolah. <strong>Gratis & gak ada watermark.</strong></p>
+                <div class="d-flex gap-2 justify-content-center justify-content-lg-start flex-wrap mt-3">
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Hasil sesuai target</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Tanpa watermark</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Aman & private</span>
                 </div>
-
-                <small class="text-muted">
-                    <i class="bi bi-shield-check"></i> File otomatis terhapus setelah download — gak ada yang disimpan.
-                </small>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <i class="bi bi-image-alt text-primary" style="font-size: 10rem; opacity: 0.15;"></i>
             </div>
         </div>
     </div>
 </section>
 
-<!-- All Tools Cards -->
+<!-- Main tool -->
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <!-- Upload area -->
+                        <div id="uploadZone" class="upload-zone text-center p-5 mb-4">
+                            <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                            <h4 class="mb-2">Drop foto di sini atau klik untuk pilih</h4>
+                            <p class="text-muted mb-0">JPG, PNG, WebP — Max 20MB</p>
+                            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/bmp" hidden>
+                        </div>
+
+                        <!-- Preview file -->
+                        <div id="filePreview" class="d-none mb-4">
+                            <div class="alert alert-light border d-flex align-items-center">
+                                <i class="bi bi-file-image text-primary fs-3 me-3"></i>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold" id="fileName">-</div>
+                                    <small class="text-muted" id="fileSize">-</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" id="removeFile">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Target size -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Target Ukuran File</label>
+                            <div class="input-group input-group-lg">
+                                <input type="number" class="form-control" id="targetKb" value="200" min="10" max="5000">
+                                <span class="input-group-text">KB</span>
+                            </div>
+                            <div class="mt-2 d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="100">100 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="200">200 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="300">300 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="500">500 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="1000">1 MB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="2000">2 MB</button>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> CPNS biasanya 200KB, lamaran kerja 500KB-1MB
+                            </small>
+                        </div>
+
+                        <!-- Action button -->
+                        <button class="btn btn-primary btn-lg w-100" id="compressBtn" disabled>
+                            <i class="bi bi-magic"></i> Kompres Sekarang
+                        </button>
+
+                        <!-- Loading -->
+                        <div id="loadingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-3 mb-0">Lagi proses... bentar ya</p>
+                        </div>
+
+                        <!-- Result -->
+                        <div id="resultState" class="d-none mt-4">
+                            <div class="alert alert-success border-0">
+                                <h5 class="alert-heading"><i class="bi bi-check-circle-fill"></i> Sukses!</h5>
+                                <div class="row text-center mt-3">
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Sebelum</small>
+                                        <strong id="resultOriginal">-</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Sesudah</small>
+                                        <strong id="resultFinal" class="text-success">-</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Hemat</small>
+                                        <strong id="resultReduction" class="text-primary">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
+                                <i class="bi bi-download"></i> Download Hasil
+                            </a>
+                            <button class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
+                                <i class="bi bi-arrow-clockwise"></i> Kompres Foto Lain
+                            </button>
+                        </div>
+
+                        <!-- Error -->
+                        <div id="errorState" class="alert alert-danger d-none mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
+                <div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
+                    <small class="text-muted d-block mb-2">Iklan</small>
+                    <div style="display: flex; justify-content: center;">
+                        <script type="text/javascript">
+                            atOptions = {
+                                'key' : 'd4c1966bed2135f18595a1ed7645db4b',
+                                'format' : 'iframe',
+                                'height' : 250,
+                                'width' : 300,
+                                'params' : {}
+                            };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tools Lainnya (cards) -->
 <section class="py-5 bg-light" id="all-tools">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold mb-2">Atau Pilih Tools Langsung</h2>
-            <p class="text-muted">Kalau lo udah tau mau pake yang mana</p>
+            <h2 class="fw-bold mb-2">Tools Lainnya</h2>
+            <p class="text-muted">Lagi dibangun, segera hadir!</p>
         </div>
         
         <div class="row g-4 justify-content-center">
-            <!-- Kompres Foto -->
-            <div class="col-md-6 col-lg-3">
-                <a href="/kompres-foto" class="text-decoration-none">
-                    <div class="card tool-card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="tool-icon bg-primary-soft mb-3">
-                                <i class="bi bi-aspect-ratio text-primary"></i>
-                            </div>
-                            <h5 class="fw-semibold text-dark">Kompres Foto</h5>
-                            <p class="text-muted small mb-0">Kecilin ke target KB. Pas buat CPNS & lamaran kerja.</p>
-                            <span class="badge bg-success-soft text-success mt-3">Ready</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Pas Foto -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <a href="/pas-foto" class="text-decoration-none">
                     <div class="card tool-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -92,8 +162,7 @@
                 </a>
             </div>
 
-            <!-- Ganti Background -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <a href="/ganti-background" class="text-decoration-none">
                     <div class="card tool-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -108,8 +177,7 @@
                 </a>
             </div>
 
-            <!-- Kompres PDF -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <a href="/kompres-pdf" class="text-decoration-none">
                     <div class="card tool-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
@@ -127,29 +195,25 @@
     </div>
 </section>
 
-<!-- Why Kompresin -->
-<section class="py-5">
+<!-- Cara pakai -->
+<section class="py-5" id="cara-pakai">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-                <h2 class="text-center fw-bold mb-5">Kenapa Pake Kompresin?</h2>
-                <div class="row g-4">
-                    <div class="col-md-4 text-center">
-                        <i class="bi bi-lightning-charge-fill text-warning display-4 mb-3"></i>
-                        <h5>Cepat & Simpel</h5>
-                        <p class="text-muted">Drop file, pilih opsi, download. Gak perlu install apapun.</p>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <i class="bi bi-shield-fill-check text-success display-4 mb-3"></i>
-                        <h5>Aman & Private</h5>
-                        <p class="text-muted">File otomatis terhapus dari server. Gak ada yang disimpan.</p>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <i class="bi bi-currency-dollar text-primary display-4 mb-3"></i>
-                        <h5>Gratis Selamanya</h5>
-                        <p class="text-muted">Gak ada watermark, gak ada batas. Beneran free.</p>
-                    </div>
-                </div>
+        <h2 class="text-center fw-bold mb-5">Cara Kompres Foto</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="step-circle">1</div>
+                <h5 class="mt-3">Upload Foto</h5>
+                <p class="text-muted">Pilih foto JPG, PNG, atau WebP dari device lo. Max 20MB.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-circle">2</div>
+                <h5 class="mt-3">Set Target KB</h5>
+                <p class="text-muted">Masukin target ukuran file (misal 200KB buat CPNS).</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-circle">3</div>
+                <h5 class="mt-3">Download</h5>
+                <p class="text-muted">Klik tombol kompres, tunggu sebentar, langsung download.</p>
             </div>
         </div>
     </div>
@@ -160,46 +224,46 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <h2 class="fw-bold mb-4 text-center">Pertanyaan Umum</h2>
+                <h2 class="fw-bold mb-4 text-center">Pertanyaan yang Sering Ditanya</h2>
                 <div class="accordion" id="faqAccordion">
                     <div class="accordion-item border-0 shadow-sm mb-2">
                         <h3 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                Apakah Kompresin gratis 100%?
+                                Apakah kompres foto ini gratis?
                             </button>
                         </h3>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Ya, semua tools gratis tanpa batas. Gak ada watermark, gak ada tier premium.</div>
+                            <div class="accordion-body">Ya, 100% gratis tanpa batasan jumlah foto yang bisa dikompres.</div>
                         </div>
                     </div>
                     <div class="accordion-item border-0 shadow-sm mb-2">
                         <h3 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                Aman gak file gue diupload ke sini?
+                                Apakah foto saya aman?
                             </button>
                         </h3>
                         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Aman. File lo otomatis terhapus dari server setelah diproses. Kami tidak menyimpan, membagikan, atau mengakses file lo.</div>
+                            <div class="accordion-body">Foto otomatis dihapus dari server setelah diproses. Kami tidak menyimpan atau membagikan foto apapun.</div>
                         </div>
                     </div>
                     <div class="accordion-item border-0 shadow-sm mb-2">
                         <h3 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                Berapa ukuran maksimal file?
+                                Berapa ukuran maksimal foto yang bisa diupload?
                             </button>
                         </h3>
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Max 20MB per file. Cukup buat hampir semua kebutuhan upload pemerintahan & job portal.</div>
+                            <div class="accordion-body">Maksimal 20MB per foto. Format yang didukung: JPG, JPEG, PNG, WebP, BMP.</div>
                         </div>
                     </div>
                     <div class="accordion-item border-0 shadow-sm">
                         <h3 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                Tools mana yang udah jalan?
+                                Kenapa hasil kompres kadang lebih kecil dari target?
                             </button>
                         </h3>
                         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Saat ini <strong>Kompres Foto</strong> sudah aktif. Pas Foto, Ganti Background, dan Kompres PDF lagi dibangun — segera rilis dalam beberapa hari.</div>
+                            <div class="accordion-body">Sistem akan mencari kualitas terbaik yang ukurannya sama atau di bawah target lo. Ini bagus karena kualitas foto tetap maksimal sambil tetap memenuhi syarat upload.</div>
                         </div>
                     </div>
                 </div>
@@ -210,5 +274,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/smart-home.js') }}"></script>
+<script src="{{ url_for('static', filename='js/kompres-foto.js') }}"></script>
 {% endblock %}

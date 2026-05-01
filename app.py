@@ -101,10 +101,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/kompres-foto')
-def kompres_foto_page():
-    """Halaman SEO dedicated buat kompres foto"""
-    return render_template('tool_kompres_foto.html')
 
 
 @app.route('/pas-foto')
@@ -236,7 +232,6 @@ def download(filename):
 def sitemap():
     pages = [
         {'loc': 'https://kompresin.my.id/', 'priority': '1.0', 'changefreq': 'weekly'},
-        {'loc': 'https://kompresin.my.id/kompres-foto', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/pas-foto', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/ganti-background', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/kompres-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
