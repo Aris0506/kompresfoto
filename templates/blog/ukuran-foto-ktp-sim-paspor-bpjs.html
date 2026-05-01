@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | Kompresin.my.id{% endblock %}
+{% block description %}{{ article.description }}{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/blog" class="text-decoration-none">Blog</a></li>
+                        <li class="breadcrumb-item active">Ukuran Foto Dokumen</li>
+                    </ol>
+                </nav>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-success me-2">{{ article.category }}</span>
+                    <small class="text-muted">{{ article.date }} · {{ article.reading_time }} baca</small>
+                </div>
+                
+                <h1 class="display-5 fw-bold mb-3">{{ article.title }}</h1>
+                <p class="lead text-muted">{{ article.description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<article class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="alert alert-primary border-0 d-flex align-items-center mb-5">
+                    <i class="bi bi-rulers fs-3 me-3"></i>
+                    <div class="flex-grow-1">
+                        <strong>Foto kegedean atau salah ukuran?</strong> Kompres atau resize sekarang gampang banget.
+                    </div>
+                    <a href="/" class="btn btn-primary ms-3">Kompres Foto</a>
+                </div>
+
+                <p class="lead">Bingung berapa ukuran pas foto buat KTP, SIM, paspor, atau BPJS? Aturan tahun 2026 tegas — salah ukuran berarti <strong>foto ditolak otomatis</strong> sama sistem digital, dan lo harus balik lagi ke studio atau kantor.</p>
+
+                <p>Artikel ini compile <strong>semua ukuran resmi dokumen Indonesia 2026</strong> dalam 1 panduan lengkap. Cek satu kali, simpen, gak perlu cari-cari di banyak situs lagi.</p>
+
+                <!-- TOC simple -->
+                <h3 class="fw-bold mt-4 mb-3">Daftar Isi</h3>
+                <ul>
+                    <li><a href="#ktp">Ukuran Foto KTP Elektronik</a></li>
+                    <li><a href="#sim">Ukuran Foto SIM</a></li>
+                    <li><a href="#paspor">Ukuran Foto Paspor Indonesia</a></li>
+                    <li><a href="#bpjs">Ukuran Foto BPJS Kesehatan</a></li>
+                    <li><a href="#sscasn">Ukuran Foto SSCASN/CPNS</a></li>
+                    <li><a href="#tabel">Tabel Ringkasan Semua Dokumen</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+
+                <!-- KTP -->
+                <h2 class="fw-bold mt-5 mb-3" id="ktp">Ukuran Foto KTP Elektronik (e-KTP)</h2>
+
+                <p>Berdasarkan <strong>Peraturan Presiden No. 96 Tahun 2018</strong>, ukuran foto e-KTP yang resmi adalah:</p>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Dimensi cm:</strong> 3,5 cm × 4,5 cm</li>
+                            <li><strong>Dimensi pixel:</strong> 400 × 500 pixel (300 DPI)</li>
+                            <li><strong>Background:</strong> Tahun lahir GANJIL → MERAH; Tahun lahir GENAP → BIRU</li>
+                            <li><strong>Format file digital:</strong> JPG/JPEG</li>
+                            <li><strong>Ukuran file:</strong> Max 200 KB</li>
+                            <li><strong>Pakaian:</strong> Formal (kemeja berkerah)</li>
+                            <li><strong>Aksesori:</strong> Tanpa kacamata gelap, tanpa filter</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p><strong>Aturan kartu KTP fisik:</strong> Ukuran kartu utuh adalah <strong>8,6 cm × 5,4 cm</strong> (mengikuti standar ISO/IEC 7810 ID-1). Ini sama dengan ukuran SIM, kartu ATM, dan BPJS.</p>
+
+                <!-- SIM -->
+                <h2 class="fw-bold mt-5 mb-3" id="sim">Ukuran Foto SIM (Surat Ijin Mengemudi)</h2>
+
+                <p>Foto SIM Indonesia menggunakan format yang mirip dengan KTP, tapi diambil langsung di Polres saat pembuatan/perpanjangan SIM.</p>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Dimensi cm:</strong> 2,5 cm × 3,5 cm (lebih kecil dari KTP)</li>
+                            <li><strong>Dimensi pixel:</strong> ~295 × 413 pixel (300 DPI)</li>
+                            <li><strong>Background:</strong> Biru (standar Polri)</li>
+                            <li><strong>Pakaian:</strong> Bebas tapi sopan & rapi</li>
+                            <li><strong>Aksesori:</strong> Tanpa kacamata, tanpa topi</li>
+                            <li><strong>Pengambilan foto:</strong> Langsung di studio Satpas Polres</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p><strong>Catatan penting:</strong> Untuk perpanjangan SIM online via aplikasi <strong>Digital Korlantas POLRI</strong>, lo perlu <strong>swafoto + foto KTP</strong> dengan format JPG max 1 MB. Pas foto formal-nya tetap di Polres.</p>
+
+                <!-- Paspor -->
+                <h2 class="fw-bold mt-5 mb-3" id="paspor">Ukuran Foto Paspor Indonesia</h2>
+
+                <p>Paspor Indonesia mengikuti standar internasional ICAO (International Civil Aviation Organization) dengan beberapa adjustment lokal.</p>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Dimensi cm:</strong> 4 cm × 6 cm (sama dengan pas foto formal umum)</li>
+                            <li><strong>Dimensi pixel:</strong> ~472 × 709 pixel (300 DPI)</li>
+                            <li><strong>Background:</strong> Putih polos (mandatory ICAO)</li>
+                            <li><strong>Format file digital:</strong> JPG</li>
+                            <li><strong>Ukuran file:</strong> Max 1 MB (M-Paspor app), Max 200 KB (web imigrasi)</li>
+                            <li><strong>Pakaian:</strong> Bukan putih (harus kontras dengan background)</li>
+                            <li><strong>Aksesori:</strong> Tanpa kacamata, tanpa hair accessories</li>
+                            <li><strong>Hijab:</strong> Boleh, tapi seluruh wajah dari dahi sampai dagu harus terlihat</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p><strong>Tips paspor:</strong> Foto paspor diambil langsung di kantor Imigrasi saat wawancara. Untuk daftar online via aplikasi <strong>M-Paspor</strong>, lo perlu upload foto KTP. Pasfoto fisik di-take di kantor.</p>
+
+                <!-- BPJS -->
+                <h2 class="fw-bold mt-5 mb-3" id="bpjs">Ukuran Foto BPJS Kesehatan</h2>
+
+                <p>Pendaftaran BPJS Kesehatan online (lewat aplikasi Mobile JKN atau website) butuh upload pas foto digital.</p>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Dimensi cm:</strong> 3 cm × 4 cm</li>
+                            <li><strong>Dimensi pixel:</strong> 354 × 472 pixel (300 DPI)</li>
+                            <li><strong>Background:</strong> Bebas (umumnya merah atau biru)</li>
+                            <li><strong>Format file:</strong> JPG/JPEG</li>
+                            <li><strong>Ukuran file:</strong> Max 50 KB (BPJS Mandiri online)</li>
+                            <li><strong>Pakaian:</strong> Sopan, formal lebih baik</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p><strong>Catatan:</strong> 50 KB itu ukuran kecil banget — pasti perlu kompresi tools. Pakai <a href="/">Kompresin target ukuran 50KB</a> biar pas, gak over.</p>
+
+                <!-- SSCASN -->
+                <h2 class="fw-bold mt-5 mb-3" id="sscasn">Ukuran Foto SSCASN / CPNS 2026</h2>
+
+                <p>Untuk pendaftaran CPNS via portal SSCASN, ada 2 jenis foto yang dibutuhkan:</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Pasfoto SSCASN</h3>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Dimensi cm:</strong> 4 cm × 6 cm</li>
+                            <li><strong>Dimensi pixel:</strong> 472 × 709 pixel (300 DPI)</li>
+                            <li><strong>Background:</strong> Merah polos</li>
+                            <li><strong>Format:</strong> JPG/JPEG (HEIC otomatis ditolak!)</li>
+                            <li><strong>Ukuran file:</strong> Max 200 KB</li>
+                            <li><strong>Pakaian:</strong> Kemeja putih formal</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="fw-bold mt-4 mb-3">Swafoto SSCASN</h3>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Dimensi:</strong> Bebas (selfie langsung dari kamera)</li>
+                            <li><strong>Background:</strong> Bebas, polos lebih baik</li>
+                            <li><strong>Format:</strong> JPG/JPEG</li>
+                            <li><strong>Ukuran file:</strong> Max 200 KB</li>
+                            <li><strong>Pakaian:</strong> Sopan, rapi</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 my-4">
+                    <strong>📚 Baca lebih lanjut:</strong> 
+                    <a href="/blog/kompres-foto-cpns-2026" class="alert-link">Panduan kompres foto CPNS</a> &nbsp;|&nbsp; 
+                    <a href="/blog/lolos-face-recognition-sscasn" class="alert-link">Tips lolos face recognition AI</a>
+                </div>
+
+                <!-- TABEL RINGKASAN -->
+                <h2 class="fw-bold mt-5 mb-3" id="tabel">Tabel Ringkasan Semua Dokumen Indonesia</h2>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Dokumen</th>
+                                <th>Dimensi (cm)</th>
+                                <th>Pixel (300 DPI)</th>
+                                <th>Background</th>
+                                <th>Max File</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>e-KTP</strong></td>
+                                <td>3,5 × 4,5</td>
+                                <td>400 × 500</td>
+                                <td>Merah/Biru</td>
+                                <td>200 KB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SIM</strong></td>
+                                <td>2,5 × 3,5</td>
+                                <td>295 × 413</td>
+                                <td>Biru</td>
+                                <td>—</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Paspor</strong></td>
+                                <td>4 × 6</td>
+                                <td>472 × 709</td>
+                                <td>Putih</td>
+                                <td>1 MB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>BPJS Kesehatan</strong></td>
+                                <td>3 × 4</td>
+                                <td>354 × 472</td>
+                                <td>Bebas</td>
+                                <td>50 KB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SSCASN Pasfoto</strong></td>
+                                <td>4 × 6</td>
+                                <td>472 × 709</td>
+                                <td>Merah</td>
+                                <td>200 KB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SSCASN Swafoto</strong></td>
+                                <td>Bebas</td>
+                                <td>Min 600 × 800</td>
+                                <td>Bebas</td>
+                                <td>200 KB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ijazah/Transkrip (PDF)</strong></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>800 KB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Surat Lamaran (PDF)</strong></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>300 KB</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tools -->
+                <h2 class="fw-bold mt-5 mb-3">Tools untuk Bikin Foto Sesuai Ukuran</h2>
+
+                <div class="row g-3 my-4">
+                    <div class="col-md-6">
+                        <a href="/" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-aspect-ratio text-primary"></i> Kompres Foto Target</h5>
+                                    <p class="text-muted mb-0 small">Set target KB exact (50KB, 200KB, 1MB). Pas, gak over.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/pas-foto" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-person-vcard text-warning"></i> Pas Foto Maker</h5>
+                                    <p class="text-muted mb-0 small">Auto resize 2x3, 3x4, 4x6 + ganti background.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/kompres-pdf" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-file-earmark-pdf text-danger"></i> Kompres PDF</h5>
+                                    <p class="text-muted mb-0 small">Ijazah/transkrip ke max 800KB. Quality bagus.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/merge-pdf" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-files text-primary"></i> Merge PDF</h5>
+                                    <p class="text-muted mb-0 small">Gabungkan beberapa dokumen jadi 1 file.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <h2 class="fw-bold mt-5 mb-3" id="faq">Pertanyaan yang Sering Ditanya</h2>
+
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q1">
+                                Kenapa ukuran foto KTP, SIM, BPJS bisa beda-beda?
+                            </button>
+                        </h3>
+                        <div id="faq-q1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Setiap dokumen punya peraturan masing-masing dari kementerian/lembaga yang berbeda. KTP diatur Kemendagri, SIM oleh Polri, BPJS oleh Kemenkes. Standardisasi global cuma berlaku untuk <strong>kartu fisik</strong> (semua mengikuti ISO/IEC 7810 ID-1 = 8,6 × 5,4 cm), tapi <strong>foto pas-nya</strong> beda-beda sesuai kebutuhan masing-masing instansi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q2">
+                                Apakah foto pas 4x6 bisa dipakai untuk semua keperluan?
+                            </button>
+                        </h3>
+                        <div id="faq-q2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Tidak.</strong> Foto 4x6 cocok untuk paspor & SSCASN, tapi untuk KTP butuh 3,5x4,5 cm dan untuk SIM butuh 2,5x3,5 cm. Selalu sesuaikan dengan keperluan spesifik. Untungnya tools <a href="/pas-foto">Pas Foto Maker</a> bisa convert antar ukuran dengan 1 klik.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q3">
+                                Cara kompres foto ke 50 KB pas (BPJS)?
+                            </button>
+                        </h3>
+                        <div id="faq-q3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Pakai tools yang bisa <strong>target ukuran spesifik</strong>. Di <a href="/">Kompresin.my.id</a>, set target file ke 50 KB, sistem otomatis kompres pas atau di bawah. Tools generic dengan opsi "high/medium/low" gak bisa target exact, hasilnya unpredictable.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q4">
+                                Format HEIC iPhone bisa pakai untuk dokumen Indonesia?
+                            </button>
+                        </h3>
+                        <div id="faq-q4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Tidak.</strong> Hampir semua portal pemerintah Indonesia (SSCASN, M-Paspor, BPJS, dll) <strong>menolak HEIC</strong>. Convert ke JPG dulu sebelum upload. Cara: di iPhone, buka Settings → Camera → Formats → pilih "Most Compatible".
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="fw-bold mt-5 mb-3">Penutup</h2>
+                <p>Bookmark artikel ini biar gak perlu cari-cari ukuran lagi tiap kali butuh foto dokumen. Ukuran-nya udah lengkap tinggal lo prep foto sesuai keperluan.</p>
+                <p>Selalu cek pengumuman resmi dari instansi terkait kalau ada update aturan. Aturan dasar di artikel ini berlaku untuk 2026.</p>
+
+                <div class="card bg-primary text-white border-0 my-5">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <h3 class="fw-bold mb-3">Mulai Bikin Foto Sesuai Ukuran Sekarang</h3>
+                        <p class="mb-4 opacity-75">Free tools, target ukuran exact, tanpa watermark.</p>
+                        <a href="/" class="btn btn-light btn-lg">
+                            <i class="bi bi-magic"></i> Coba Tools Kompresin
+                        </a>
+                    </div>
+                </div>
+
+                <div class="border-top pt-4 mt-5">
+                    <small class="text-muted">
+                        <strong>Disclaimer:</strong> Informasi disusun berdasarkan peraturan resmi yang berlaku per {{ article.date }}. Standar dapat berubah. Selalu verifikasi dengan instansi terkait sebelum membuat dokumen.
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ article.title }}",
+    "description": "{{ article.description }}",
+    "author": {"@type": "Organization", "name": "Kompresin.my.id"},
+    "publisher": {"@type": "Organization", "name": "Kompresin.my.id"},
+    "datePublished": "{{ article.date }}",
+    "dateModified": "{{ article.date }}"
+}
+</script>
+{% endblock %}

@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | Kompresin.my.id{% endblock %}
+{% block description %}{{ article.description }}{% endblock %}
+
+{% block content %}
+
+<!-- Article Hero -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/blog" class="text-decoration-none">Blog</a></li>
+                        <li class="breadcrumb-item active">Face Recognition SSCASN</li>
+                    </ol>
+                </nav>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-primary me-2">{{ article.category }}</span>
+                    <small class="text-muted">{{ article.date }} · {{ article.reading_time }} baca</small>
+                </div>
+                
+                <h1 class="display-5 fw-bold mb-3">{{ article.title }}</h1>
+                <p class="lead text-muted">{{ article.description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<article class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Quick CTA at top -->
+                <div class="alert alert-warning border-0 d-flex align-items-center mb-5">
+                    <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+                    <div class="flex-grow-1">
+                        <strong>Status TMS karena foto?</strong> Cek penyebab dan cara fix-nya di artikel ini. Tools-nya udah lo perlukan.
+                    </div>
+                    <a href="/" class="btn btn-warning ms-3">Fix Foto</a>
+                </div>
+
+                <!-- INTRO -->
+                <p class="lead">Bayangin ini: lo udah belajar materi CPNS berbulan-bulan. Lo udah lengkap semua berkas. Tapi pas hari pendaftaran, status lo langsung <strong>"Tidak Memenuhi Syarat (TMS)"</strong> karena <strong>face recognition AI nolak foto lo</strong>. Ribuan pelamar tiap tahun gagal di sini — bukan karena kualifikasi mereka kurang, tapi karena teknis foto.</p>
+
+                <p>Tahun 2026, BKN ngeluarin sistem verifikasi <strong>Face Recognition (FR) AI yang lebih ketat</strong> dari sebelumnya. Pengalaman pelamar musim 2025 nunjukin pola: ada error-error spesifik yang bikin AI nolak — dan kebanyakan bisa <strong>dicegah</strong> kalau lo paham aturan main-nya.</p>
+
+                <p>Artikel ini akan kasih lo:</p>
+                <ul>
+                    <li>Cara kerja face recognition SSCASN (technical breakdown)</li>
+                    <li>7 alasan utama foto lo ditolak AI BKN</li>
+                    <li>Setup teknis yang bikin AI lo "lulus" (pencahayaan, dimensi, format)</li>
+                    <li>Apa yg HARUS DIHINDARI saat ambil foto/swafoto</li>
+                    <li>Strategi recovery kalau status lo udah TMS</li>
+                </ul>
+
+                <!-- H2: Cara Kerja FR -->
+                <h2 class="fw-bold mt-5 mb-3" id="cara-kerja">Cara Kerja Face Recognition SSCASN BKN 2026</h2>
+
+                <p>Sebelum lo bisa "ngalahin" sistemnya, lo harus paham gimana cara kerjanya dulu.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">3 Stage Verifikasi Face Recognition BKN</h3>
+
+                <p>Sistem face recognition SSCASN bukan cuma 1 tahap. Foto lo bakal dicek <strong>minimal 3 kali</strong> selama proses pendaftaran sampai tes:</p>
+
+                <ol>
+                    <li><strong>Stage 1 - Upload Pasfoto:</strong> Foto formal background merah lo dianalisis AI untuk ekstrak <em>face embedding</em> (data biometrik wajah dalam bentuk vector matematika).</li>
+                    <li><strong>Stage 2 - Swafoto Akun:</strong> Saat bikin akun, lo diminta selfie. Sistem bandingin dengan pasfoto lo + foto KTP di database Dukcapil. <em>3 sumber harus match.</em></li>
+                    <li><strong>Stage 3 - Tes CAT/SKD:</strong> Saat hari tes, lo akan di-scan ulang dengan webcam ujian. Kalau wajah lo gak match dengan database, ujian otomatis dibatalkan.</li>
+                </ol>
+
+                <h3 class="fw-bold mt-4 mb-3">Kenapa AI BKN Susah Dibohongin?</h3>
+
+                <p>Sistem FR BKN pake teknologi <strong>deep learning convolutional neural network (CNN)</strong> yang dilatih dengan <strong>jutaan data wajah Indonesia</strong>. Mereka bisa deteksi:</p>
+
+                <ul>
+                    <li>✅ Filter wajah (skin smoothing, jaw reshape)</li>
+                    <li>✅ Foto print yang difoto ulang (anti-spoofing)</li>
+                    <li>✅ Foto AI generated (DeepFake detection)</li>
+                    <li>✅ Wajah tidak konsisten dengan KTP</li>
+                    <li>✅ Pose & expression yg out-of-distribution</li>
+                </ul>
+
+                <p><strong>Bottom line:</strong> Jangan coba "akalin" sistemnya. Strategy yg bener = kasih AI input yg <strong>clean & natural</strong>.</p>
+
+                <!-- H2: Alasan ditolak -->
+                <h2 class="fw-bold mt-5 mb-3" id="alasan-ditolak">7 Alasan Utama Face Recognition Nolak Foto Lo</h2>
+
+                <p>Berdasarkan data dari komunitas pelamar SSCASN 2025-2026, ini alasan paling sering bikin status TMS:</p>
+
+                <h3 class="fw-bold mt-4 mb-3">1. Filter Beauty / Skin Smoothing</h3>
+
+                <p>Aplikasi kamera default banyak HP Android (Xiaomi, Oppo, Vivo) <strong>auto-aktifin filter beauty</strong> tanpa lo sadari. Kulit jadi terlalu halus, mata diperbesar, dagu dipertajam. AI BKN langsung deteksi ini sebagai <strong>"data biometrik tidak natural"</strong>.</p>
+
+                <p><strong>Solusi:</strong> Matikan filter beauty di setting kamera. Kalau perlu, pake aplikasi kamera pihak ketiga seperti <em>Open Camera</em> (Android) yang gak ada filter sama sekali.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">2. Pencahayaan Tidak Rata (Shadow di Wajah)</h3>
+
+                <p>Cahaya dari atas atau samping bikin <strong>shadow di salah satu sisi wajah</strong>. AI gagal ekstrak feature wajah secara konsisten karena <em>"setengah wajah hilang"</em>.</p>
+
+                <p><strong>Solusi:</strong></p>
+                <ul>
+                    <li>Foto di depan jendela siang hari (cahaya natural)</li>
+                    <li>Atau pake 2 lampu (kiri & kanan) dengan jarak yg sama</li>
+                    <li>Hindari foto malam dengan cuma 1 lampu di atas</li>
+                </ul>
+
+                <h3 class="fw-bold mt-4 mb-3">3. Foto dari Print yang Difoto Ulang</h3>
+
+                <p>Banyak pelamar mengira: <em>"Pasfoto saya cetak di studio, terus saya foto pake HP."</em> AI BKN punya <strong>anti-spoofing detection</strong> yang detect:</p>
+                <ul>
+                    <li>Pantulan cahaya pada kertas foto</li>
+                    <li>Pixelation pattern dari hasil cetak</li>
+                    <li>Tepi kertas yang tidak rata</li>
+                </ul>
+
+                <p><strong>Solusi:</strong> Minta studio foto kasih file <strong>digital JPG asli</strong> (bukan hasil cetak). Atau langsung foto sendiri dengan setup yang bener.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">4. Penampilan Beda dari Foto KTP</h3>
+
+                <p>Ini paling tricky. Kalau lo:</p>
+                <ul>
+                    <li>Foto KTP umur 18 tahun, sekarang lo 28 tahun (10 tahun beda)</li>
+                    <li>Sebelumnya pake hijab, sekarang gak (atau sebaliknya)</li>
+                    <li>Sebelumnya kurus, sekarang gemuk drastis</li>
+                    <li>Punya jenggot/kumis sekarang yg gak ada di KTP</li>
+                </ul>
+
+                <p>AI bakal <strong>flag inconsistency</strong> dan tolak verifikasi.</p>
+
+                <p><strong>Solusi:</strong> 
+                <ul>
+                    <li>Update KTP dulu di Dukcapil (foto baru, gratis di banyak daerah)</li>
+                    <li>Sesuaikan penampilan saat foto SSCASN dengan KTP lo (cukur jenggot, dll)</li>
+                    <li>Atau minimal: minta perekam KTP foto baru sebelum daftar CPNS</li>
+                </ul></p>
+
+                <h3 class="fw-bold mt-4 mb-3">5. Resolusi Foto Terlalu Rendah</h3>
+
+                <p>Foto blur atau resolusi rendah (di bawah 300×450 pixel) bikin AI <strong>gagal ekstrak feature wajah</strong>. Foto lo dianggap "tidak readable".</p>
+
+                <p><strong>Solusi:</strong> Gunakan kamera HP minimal 8 MP. Foto dengan resolusi original, JANGAN crop ekstrim.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">6. Aksesori Menutupi Wajah</h3>
+
+                <p>Apapun yang menutupi <strong>landmark wajah utama</strong> (mata, hidung, mulut, dagu) akan bikin AI gagal:</p>
+                <ul>
+                    <li>❌ Kacamata frame tebal (apalagi gelap)</li>
+                    <li>❌ Masker (seringnya gak diizinkan)</li>
+                    <li>❌ Topi yg menutup kening</li>
+                    <li>❌ Hijab yang nutupin sebagian dagu/dahi</li>
+                </ul>
+
+                <p><strong>Solusi:</strong> Lepas semua aksesori. Hijab boleh tapi pastikan <strong>seluruh wajah dari dahi sampe dagu terlihat jelas</strong>.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">7. Format File / Ukuran Tidak Sesuai</h3>
+
+                <p>Walaupun bukan langsung "face recognition error", banyak yang ditolak di tahap awal karena:</p>
+                <ul>
+                    <li>Format <strong>HEIC dari iPhone</strong> (otomatis ditolak)</li>
+                    <li>Format <strong>PNG</strong> di-rename jadi .jpg (sistem tetep deteksi)</li>
+                    <li>Ukuran file di atas 200 KB</li>
+                    <li>File corrupt karena over-compress</li>
+                </ul>
+
+                <p><strong>Solusi:</strong> Pake tools <a href="/">Kompresin.my.id</a> untuk kompres ke target 200KB exact, format JPG asli.</p>
+
+                <!-- INLINE CTA -->
+                <div class="alert alert-info border-0 my-4">
+                    <strong>💡 Pro tip:</strong> Kompresin punya tool <a href="/" class="alert-link">target ukuran spesifik</a> yang bisa kompres foto lo ke <strong>tepat 200KB</strong>. Tools generic banyak yg hasilnya over (220KB, 250KB) — itu auto-reject di SSCASN.
+                </div>
+
+                <!-- H2: Setup Teknis -->
+                <h2 class="fw-bold mt-5 mb-3" id="setup-teknis">Setup Teknis Foto yang Lulus AI BKN</h2>
+
+                <p>Berikut <strong>checklist final</strong> setup foto pasfoto + swafoto yang aman lulus face recognition:</p>
+
+                <h3 class="fw-bold mt-4 mb-3">📷 Setup Pasfoto</h3>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Background:</strong> Merah polos (kain merah / dinding cat merah)</li>
+                            <li><strong>Pakaian:</strong> Kemeja putih berkerah (warna kontras dgn bg)</li>
+                            <li><strong>Pose:</strong> Wajah lurus ke kamera, bahu rileks</li>
+                            <li><strong>Ekspresi:</strong> Netral atau senyum tipis (mulut tertutup)</li>
+                            <li><strong>Pencahayaan:</strong> Cahaya rata dari depan, no shadow</li>
+                            <li><strong>Aksesori:</strong> Lepas kacamata, topi, jam tangan</li>
+                            <li><strong>Resolusi:</strong> Min 472×709 pixel (300 DPI)</li>
+                            <li><strong>Format:</strong> JPG/JPEG asli (bukan rename PNG)</li>
+                            <li><strong>Ukuran file:</strong> Max 200 KB (ideal 100-200 KB)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="fw-bold mt-4 mb-3">🤳 Setup Swafoto Saat Bikin Akun</h3>
+
+                <div class="card border-0 bg-light my-3">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li><strong>Lensa kamera:</strong> Bersihkan dulu (banyak smudge!)</li>
+                            <li><strong>Kamera depan:</strong> Pegang sejajar wajah (gak miring/atas/bawah)</li>
+                            <li><strong>Background:</strong> Polos & terang (tembok putih ideal)</li>
+                            <li><strong>Pakaian:</strong> Sopan & rapi (kemeja recommended)</li>
+                            <li><strong>Pencahayaan:</strong> Hadap jendela siang hari, atau ring light</li>
+                            <li><strong>Filter:</strong> ❌ JANGAN PAKAI APAPUN</li>
+                            <li><strong>Konsistensi:</strong> Penampilan match dengan pasfoto</li>
+                            <li><strong>Ukuran file:</strong> Max 200 KB JPG/PNG</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="fw-bold mt-4 mb-3">⚠️ Yang Wajib DIHINDARI (Common Mistakes)</h3>
+
+                <ul>
+                    <li>❌ Foto KTP fisik diambil pake HP (resolusi jelek)</li>
+                    <li>❌ Pake aplikasi kamera dengan filter beauty otomatis</li>
+                    <li>❌ Foto malam hari di bawah lampu kuning (warna shifting)</li>
+                    <li>❌ Wajah miring 30+ derajat dari frontal</li>
+                    <li>❌ Crop foto setengah-setengah (bahu kepotong)</li>
+                    <li>❌ Foto dari pas foto cetak (anti-spoofing detect)</li>
+                    <li>❌ Pakai kacamata gelap atau warna kuat</li>
+                    <li>❌ Foto dengan background ramai (gradient atau motif)</li>
+                </ul>
+
+                <!-- H2: Strategi Recovery -->
+                <h2 class="fw-bold mt-5 mb-3" id="recovery">Strategi Recovery Kalau Status TMS</h2>
+
+                <p>Kalau lo udah keburu daftar dan status lo <strong>TMS karena foto</strong>, jangan panik. Beberapa kasus masih bisa di-recover:</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Step 1: Cek Alasan TMS Spesifik</h3>
+
+                <p>Login ke akun SSCASN lo, di dashboard akan muncul alasan TMS-nya. Catat alasan exact-nya, kayak:</p>
+                <ul>
+                    <li><em>"Foto tidak terverifikasi face recognition"</em></li>
+                    <li><em>"Format file tidak sesuai"</em></li>
+                    <li><em>"Ukuran file melebihi batas"</em></li>
+                    <li><em>"Wajah tidak terdeteksi"</em></li>
+                </ul>
+
+                <h3 class="fw-bold mt-4 mb-3">Step 2: Kontak Helpdesk BKN</h3>
+
+                <p>Kalau pendaftaran masih buka, lo bisa kontak <strong>Helpdesk BKN</strong>:</p>
+                <ul>
+                    <li>Email: <a href="mailto:helpdesk-sscasn@bkn.go.id">helpdesk-sscasn@bkn.go.id</a></li>
+                    <li>WhatsApp Resmi BKN (cek di portal sscasn.bkn.go.id)</li>
+                    <li>Twitter @BKNgoid (response cepat)</li>
+                </ul>
+
+                <p>Jelaskan situasi dengan detail. Kasus tertentu (terutama kalau alasan TMS gak jelas) bisa di-banding.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Step 3: Daftar Ulang dengan Foto Baru</h3>
+
+                <p>Kalau pendaftaran masih buka & akun lo bisa daftar ulang:</p>
+                <ol>
+                    <li>Foto ulang dengan setup yang bener (sesuai checklist di atas)</li>
+                    <li>Kompres ke <a href="/">tepat 200KB</a> dengan tools yg accurate</li>
+                    <li>Daftar ulang sebelum deadline</li>
+                    <li>Test dulu dengan upload, kalau face recognition berhasil baru lanjut</li>
+                </ol>
+
+                <h3 class="fw-bold mt-4 mb-3">Step 4: Persiapan untuk Tahun Depan</h3>
+
+                <p>Kalau pendaftaran udah closed, prep buat tahun depan:</p>
+                <ul>
+                    <li>Update KTP di Dukcapil (foto baru)</li>
+                    <li>Foto pasfoto profesional di studio (minta file digital)</li>
+                    <li>Setup home studio sederhana (tembok merah + ring light)</li>
+                </ul>
+
+                <!-- H2: Tools Lain -->
+                <h2 class="fw-bold mt-5 mb-3" id="tools-lain">Tools Lain yang Membantu</h2>
+
+                <p>Selain kompres foto, ada beberapa tools lain yang bakal bantu lo prep berkas SSCASN:</p>
+
+                <div class="row g-3 my-4">
+                    <div class="col-md-6">
+                        <a href="/" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-aspect-ratio text-primary"></i> Kompres Foto Target</h5>
+                                    <p class="text-muted mb-0 small">Pas 200KB tepat, gak over. Format JPG asli.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/pas-foto" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-person-vcard text-warning"></i> Pas Foto Maker</h5>
+                                    <p class="text-muted mb-0 small">Auto resize 4x6 + background merah polos.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/blog/kompres-foto-cpns-2026" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-book text-success"></i> Panduan Kompres CPNS</h5>
+                                    <p class="text-muted mb-0 small">Artikel lengkap requirement foto SSCASN.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/kompres-pdf" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-file-earmark-pdf text-danger"></i> Kompres PDF</h5>
+                                    <p class="text-muted mb-0 small">Ijazah/transkrip ke max 800KB. Quality bagus.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- H2: FAQ -->
+                <h2 class="fw-bold mt-5 mb-3" id="faq">Pertanyaan yang Sering Ditanya (FAQ)</h2>
+
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q1">
+                                Foto saya udah sesuai tapi tetep ditolak, kenapa?
+                            </button>
+                        </h3>
+                        <div id="faq-q1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Kemungkinan besar ada <strong>filter halus</strong> dari aplikasi kamera default lo yang gak lo sadari. Banyak HP Android (Xiaomi, Oppo, Vivo) auto-aktifin filter beauty. Coba: matikan filter di setting, atau pake aplikasi <em>Open Camera</em> (Android) yang gak ada filter. Ulangi foto, recompres ke 200KB pas, daftar ulang.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q2">
+                                Pengguna hijab gimana, dilarang gak?
+                            </button>
+                        </h3>
+                        <div id="faq-q2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Hijab <strong>boleh</strong>, asal seluruh wajah dari <strong>dahi sampai dagu</strong> kelihatan jelas. Hindari hijab yang nutupin sebagian dahi atau dagu. AI BKN dilatih dengan data wajah hijabi Indonesia, jadi gak akan masalah selama landmark wajah tersembunyi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q3">
+                                Foto KTP saya udah lama dan beda dengan sekarang. Gimana?
+                            </button>
+                        </h3>
+                        <div id="faq-q3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Update KTP dulu di Dukcapil sebelum daftar CPNS. Banyak Dukcapil di Indonesia gratis bikin KTP baru sekali per 5 tahun. Atau, kalau lo gak sempat update, sesuaikan penampilan lo saat foto pasfoto/swafoto biar match dengan KTP (cukur jenggot, jangan pake makeup tebal, dll). AI bandingin dengan foto KTP di database Dukcapil.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q4">
+                                Kalau swafoto saya berkacamata (minus), gimana?
+                            </button>
+                        </h3>
+                        <div id="faq-q4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Tergantung. Kalau di KTP lo juga pake kacamata (bingkai serupa), <strong>boleh</strong>. Kalau di KTP gak pake, <strong>jangan pake saat swafoto</strong> — biar konsisten. Kacamata gelap atau bingkai tebal yang menutupi mata <strong>tidak diperbolehkan</strong> apapun kondisinya.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q5">
+                                Berapa kali kesempatan upload foto kalau ditolak?
+                            </button>
+                        </h3>
+                        <div id="faq-q5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Sistem SSCASN biasanya kasih <strong>3-5 kali kesempatan</strong> re-upload sebelum akun terkunci. Setelah itu, perlu kontak Helpdesk BKN untuk reset. Saran: <strong>JANGAN buru-buru klik "Submit"</strong>. Test foto dulu dengan upload, kalau verifikasi sukses baru lanjut tahap berikutnya.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q6">
+                                Apakah pasfoto saya bisa dipakai juga untuk swafoto?
+                            </button>
+                        </h3>
+                        <div id="faq-q6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Tidak.</strong> Sistem SSCASN sengaja minta 2 foto berbeda buat <strong>cross-validation</strong>. Kalau lo upload pasfoto sebagai swafoto (atau sebaliknya), AI akan deteksi "1 foto duplikat" dan reject. Pasfoto = file JPG yang lo upload. Swafoto = selfie LIVE dari kamera HP/laptop saat bikin akun.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Closing -->
+                <h2 class="fw-bold mt-5 mb-3">Penutup: Antisipasi > Recovery</h2>
+
+                <p>Banyak pelamar gugur di seleksi administrasi cuma karena <strong>foto gak lulus face recognition</strong>. Ini sebenarnya bisa <strong>100% dicegah</strong> kalau lo paham aturan main AI BKN.</p>
+
+                <p>Take time satu hari buat prep foto yg bener, ikuti checklist di artikel ini, terus test dulu sebelum submit final. <strong>1 hari prep = ribuan jam yg gak terbuang sia-sia di tahap selanjutnya.</strong></p>
+
+                <p>Selalu monitor pengumuman resmi di <a href="https://sscasn.bkn.go.id" target="_blank" rel="noopener">sscasn.bkn.go.id</a> karena sistem bisa berubah tahun ke tahun. Good luck calon ASN! 🇮🇩</p>
+
+                <!-- Final CTA -->
+                <div class="card bg-primary text-white border-0 my-5">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <h3 class="fw-bold mb-3">Siap Bikin Foto SSCASN yang AI-Approved?</h3>
+                        <p class="mb-4 opacity-75">Mulai dari kompres foto target 200KB pas — hasil sesuai requirement BKN.</p>
+                        <a href="/" class="btn btn-light btn-lg">
+                            <i class="bi bi-magic"></i> Mulai Kompres Foto
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article meta -->
+                <div class="border-top pt-4 mt-5">
+                    <small class="text-muted">
+                        <strong>Disclaimer:</strong> Artikel ini disusun berdasarkan informasi resmi BKN dan pengalaman pelamar SSCASN per {{ article.date }}. Sistem face recognition BKN dapat berubah sesuai update teknologi. Selalu verifikasi di portal resmi <a href="https://sscasn.bkn.go.id" target="_blank" rel="noopener">sscasn.bkn.go.id</a>.
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- Schema markup -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ article.title }}",
+    "description": "{{ article.description }}",
+    "author": {
+        "@type": "Organization",
+        "name": "Kompresin.my.id"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Kompresin.my.id"
+    },
+    "datePublished": "{{ article.date }}",
+    "dateModified": "{{ article.date }}"
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Foto saya udah sesuai tapi tetep ditolak SSCASN, kenapa?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Kemungkinan besar ada filter halus dari aplikasi kamera default yang otomatis aktif. Coba matikan filter di setting kamera atau pakai aplikasi Open Camera yang gak ada filter."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Pengguna hijab boleh untuk SSCASN?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Boleh, asal seluruh wajah dari dahi sampai dagu kelihatan jelas. Hindari hijab yang menutupi sebagian dahi atau dagu."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Berapa kali kesempatan upload foto kalau ditolak SSCASN?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sistem SSCASN biasanya kasih 3-5 kali kesempatan re-upload sebelum akun terkunci. Setelah itu perlu kontak Helpdesk BKN."
+            }
+        }
+    ]
+}
+</script>
+{% endblock %}

@@ -151,6 +151,20 @@ BLOG_ARTICLES = {
         'category': 'CPNS',
         'reading_time': '8 menit',
     },
+    'lolos-face-recognition-sscasn': {
+        'title': 'Cara Lolos Verifikasi Face Recognition SSCASN CPNS 2026 (Anti TMS)',
+        'description': 'Panduan teknis lolos verifikasi face recognition AI di SSCASN. Hindari status TMS dengan tips dari pengalaman pelamar 2025-2026. Apa yg bikin AI nolak foto lo?',
+        'date': '2026-05-02',
+        'category': 'CPNS',
+        'reading_time': '10 menit',
+    },
+    'ukuran-foto-ktp-sim-paspor-bpjs': {
+        'title': 'Ukuran Foto KTP, SIM, Paspor, BPJS - Panduan Lengkap 2026',
+        'description': 'Lengkap! Ukuran foto KTP (3.5x4.5 cm), SIM, paspor, BPJS, dan dokumen Indonesia. Spesifikasi pixel, cm, KB sesuai aturan resmi 2026.',
+        'date': '2026-05-03',
+        'category': 'Dokumen',
+        'reading_time': '7 menit',
+    },
     # Nanti tambah artikel lain di sini
 }
 
@@ -512,6 +526,8 @@ def sitemap():
         {'loc': 'https://kompresin.my.id/merge-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/blog', 'priority': '0.8', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/blog/kompres-foto-cpns', 'priority': '0.9', 'changefreq': 'monthly'},
+        {'loc': 'https://kompresin.my.id/blog/lolos-face-recognition-sscasn', 'priority': '0.9', 'changefreq': 'monthly'},
+        {'loc': 'https://kompresin.my.id/blog/ukuran-foto-ktp-sim-paspor-bpjs', 'priority': '0.9', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/cpns', 'priority': '0.8', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/lamaran-kerja', 'priority': '0.8', 'changefreq': 'monthly'},
     ]
