@@ -137,6 +137,44 @@ def cpns_landing():
 def lamaran_landing():
     return render_template('lamaran.html')
 
+# ============================================================
+# BLOG: Pillar content untuk SEO
+# ============================================================
+import os as _os_blog  # alias biar gak conflict
+
+# Mapping slug ke metadata artikel (gampang nambah artikel baru)
+BLOG_ARTICLES = {
+    'kompres-foto-cpns-2026': {
+        'title': 'Cara Kompres Foto SSCASN CPNS 2026 - Maksimal 200KB Tanpa Aplikasi',
+        'description': 'Panduan lengkap kompres foto pasfoto, swafoto, dan dokumen untuk SSCASN CPNS 2026. Sesuai requirement 200KB tanpa aplikasi, gratis & tanpa watermark.',
+        'date': '2026-05-01',
+        'category': 'CPNS',
+        'reading_time': '8 menit',
+    },
+    # Nanti tambah artikel lain di sini
+}
+
+
+@app.route('/blog')
+def blog_index():
+    """Halaman list semua artikel."""
+    articles = [
+        {'slug': slug, **meta}
+        for slug, meta in BLOG_ARTICLES.items()
+    ]
+    return render_template('blog/index.html', articles=articles)
+
+
+@app.route('/blog/<slug>')
+def blog_post(slug):
+    """Halaman individual artikel."""
+    if slug not in BLOG_ARTICLES:
+        return "Artikel tidak ditemukan", 404
+    
+    article = BLOG_ARTICLES[slug]
+    template_path = f'blog/{slug}.html'
+    return render_template(template_path, article=article, slug=slug)
+
 
 
 
@@ -472,6 +510,8 @@ def sitemap():
         {'loc': 'https://kompresin.my.id/ganti-background', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/kompres-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/merge-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
+        {'loc': 'https://kompresin.my.id/blog', 'priority': '0.8', 'changefreq': 'weekly'},
+        {'loc': 'https://kompresin.my.id/blog/kompres-foto-cpns-2026', 'priority': '0.9', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/cpns', 'priority': '0.8', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/lamaran-kerja', 'priority': '0.8', 'changefreq': 'monthly'},
     ]

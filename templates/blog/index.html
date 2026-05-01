@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Blog Kompresin - Tips & Panduan File CPNS, Lamaran Kerja, Kuliah{% endblock %}
+{% block description %}Kumpulan tips dan panduan praktis untuk kompres foto, kompres PDF, dan kelola berkas digital. Khusus untuk CPNS, lamaran kerja, dan dokumen kuliah Indonesia.{% endblock %}
+
+{% block content %}
+<section class="hero py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 text-center">
+                <h1 class="display-5 fw-bold mb-3">Blog <span class="text-primary">Kompresin</span></h1>
+                <p class="lead text-muted">Tips & panduan praktis kelola file digital — khusus untuk pelajar, fresh graduate, dan pelamar kerja Indonesia.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                {% if articles %}
+                <div class="row g-4">
+                    {% for article in articles %}
+                    <div class="col-12">
+                        <a href="/blog/{{ article.slug }}" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100 article-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge bg-primary-soft text-primary me-2">{{ article.category }}</span>
+                                        <small class="text-muted">{{ article.date }} · {{ article.reading_time }} baca</small>
+                                    </div>
+                                    <h3 class="fw-bold text-dark mb-2">{{ article.title }}</h3>
+                                    <p class="text-muted mb-0">{{ article.description }}</p>
+                                    <div class="mt-3 text-primary fw-semibold">
+                                        Baca selengkapnya <i class="bi bi-arrow-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-pencil-square text-muted display-1"></i>
+                    <p class="text-muted mt-3">Artikel akan segera hadir!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.article-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+}
+</style>
+{% endblock %}

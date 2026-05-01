@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | Kompresin.my.id{% endblock %}
+{% block description %}{{ article.description }}{% endblock %}
+
+{% block content %}
+
+<!-- Article Hero -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/blog" class="text-decoration-none">Blog</a></li>
+                        <li class="breadcrumb-item active">CPNS 2026</li>
+                    </ol>
+                </nav>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-primary me-2">{{ article.category }}</span>
+                    <small class="text-muted">{{ article.date }} · {{ article.reading_time }} baca</small>
+                </div>
+                
+                <h1 class="display-5 fw-bold mb-3">{{ article.title }}</h1>
+                <p class="lead text-muted">{{ article.description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Article Body -->
+<article class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Quick CTA at top -->
+                <div class="alert alert-primary border-0 d-flex align-items-center mb-5">
+                    <i class="bi bi-lightning-charge-fill fs-3 me-3"></i>
+                    <div class="flex-grow-1">
+                        <strong>Buru-buru?</strong> Langsung kompres foto lo ke 200KB dalam 5 detik.
+                    </div>
+                    <a href="/" class="btn btn-primary ms-3">Kompres Foto</a>
+                </div>
+
+                <!-- INTRO -->
+                <p class="lead">Lo lagi panik karena foto buat upload SSCASN CPNS 2026 kegedean? Tenang, lo gak sendirian. Setiap musim CPNS, ratusan ribu pelamar gagal di tahap administrasi cuma karena <strong>foto gak sesuai requirement teknis</strong> — bukan karena kualifikasi mereka kurang.</p>
+
+                <p>Kabar baiknya: lo bisa kompres foto SSCASN ke <strong>maksimal 200 KB</strong> tanpa install aplikasi, tanpa Photoshop, tanpa bayar — cukup pake browser HP atau laptop lo. Artikel ini akan kasih lo panduan lengkap berdasarkan <strong>aturan resmi BKN 2026</strong>, plus tools gratis yang bisa lo pake langsung.</p>
+
+                <p>Yang akan lo pelajari di artikel ini:</p>
+                <ul>
+                    <li>Persyaratan resmi foto SSCASN 2026 (pasfoto + swafoto)</li>
+                    <li>Cara kompres foto ke 200KB dalam 3 langkah (tanpa aplikasi)</li>
+                    <li>Cara ubah background foto jadi merah polos</li>
+                    <li>Tips lolos verifikasi face recognition BKN</li>
+                    <li>Kesalahan fatal yang bikin pelamar gugur di seleksi administrasi</li>
+                </ul>
+
+                <!-- H2: Persyaratan resmi -->
+                <h2 class="fw-bold mt-5 mb-3" id="persyaratan">Persyaratan Foto SSCASN CPNS 2026 (Resmi BKN)</h2>
+
+                <p>Sebelum lo kompres apa-apa, pastikan dulu lo paham <strong>spesifikasi resmi yang ditetapkan BKN</strong>. Banyak pelamar gugur karena salah paham di sini.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Spesifikasi Pasfoto SSCASN 2026</h3>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item</th>
+                                <th>Persyaratan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Dimensi</strong></td>
+                                <td>4×6 cm (300×450 pixel pada 300 DPI)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Format File</strong></td>
+                                <td>JPG / JPEG <em>(format lain otomatis ditolak)</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ukuran File</strong></td>
+                                <td>Maksimal <strong>200 KB</strong> (ideal 100-200 KB)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Background</strong></td>
+                                <td><strong>Merah polos</strong> (tanpa gradasi atau motif)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pakaian</strong></td>
+                                <td>Kemeja putih formal berkerah</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pose</strong></td>
+                                <td>Wajah lurus ke kamera, ekspresi netral</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Aksesori</strong></td>
+                                <td>Tidak boleh kacamata gelap atau filter beauty</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="fw-bold mt-4 mb-3">Spesifikasi Swafoto SSCASN 2026</h3>
+
+                <p>Swafoto (selfie) berbeda dengan pasfoto. Ketentuannya lebih longgar:</p>
+
+                <ul>
+                    <li><strong>Ukuran file:</strong> Maksimal <strong>200 KB</strong></li>
+                    <li><strong>Format:</strong> JPG / JPEG</li>
+                    <li><strong>Background:</strong> Bebas (tapi pilih yang polos & terang)</li>
+                    <li><strong>Pakaian:</strong> Sopan dan formal (gak harus kemeja putih)</li>
+                    <li><strong>Pencahayaan:</strong> Wajah harus terlihat jelas, tanpa shadow gelap</li>
+                </ul>
+
+                <h3 class="fw-bold mt-4 mb-3">Spesifikasi Dokumen Lain</h3>
+
+                <ul>
+                    <li><strong>Scan KTP:</strong> Maksimal 200 KB (JPG)</li>
+                    <li><strong>Ijazah & Transkrip:</strong> Maksimal 800 KB (PDF)</li>
+                    <li><strong>Surat Lamaran:</strong> Maksimal 300 KB (PDF)</li>
+                    <li><strong>Surat Pernyataan:</strong> Maksimal 300 KB (PDF)</li>
+                </ul>
+
+                <!-- INLINE CTA -->
+                <div class="alert alert-success border-0 my-4">
+                    <strong>💡 Pro tip:</strong> Lo bisa <a href="/" class="alert-link">kompres foto ke ukuran target spesifik</a> (misal 200KB pas) menggunakan tools Kompresin. Hasilnya gak akan over target, jadi pasti lolos requirement BKN.
+                </div>
+
+                <!-- H2: Cara kompres -->
+                <h2 class="fw-bold mt-5 mb-3" id="cara-kompres">Cara Kompres Foto SSCASN ke 200KB (3 Langkah)</h2>
+
+                <p>Cara paling cepat dan gampang adalah pake <strong>online compressor</strong> yang bisa target ukuran spesifik. Ikuti langkah berikut:</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Langkah 1: Buka Kompresin.my.id</h3>
+
+                <p>Buka browser HP atau laptop lo, ketik: <strong><a href="/">kompresin.my.id</a></strong>. Gak perlu install apapun, gak perlu daftar akun.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Langkah 2: Upload foto pasfoto / swafoto lo</h3>
+
+                <p>Klik area "Drop foto di sini" atau drag foto langsung dari folder. Format yang didukung: JPG, PNG, WebP, BMP. Maksimal 20MB per foto.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">Langkah 3: Set target 200 KB → Klik Kompres</h3>
+
+                <p>Di kolom "Target Ukuran File", masukkan angka <strong>200</strong>. Atau klik tombol preset "200 KB" yang udah tersedia. Klik "Kompres Sekarang", tunggu 2-5 detik, terus download.</p>
+
+                <p>Hasilnya akan <strong>pas atau di bawah 200 KB</strong> — gak akan over. Sistem otomatis cari kualitas terbaik yang masih memenuhi target.</p>
+
+                <div class="alert alert-info border-0 my-4">
+                    <strong>📐 Catatan dimensi:</strong> Pastikan foto lo udah dalam dimensi 4x6 cm (300×450 pixel) sebelum di-kompres. Kalau belum, foto bakal di-resize otomatis tapi mungkin gak proporsional. Ideally, foto pasfoto langsung di studio dengan dimensi yg bener.
+                </div>
+
+                <!-- H2: Background merah -->
+                <h2 class="fw-bold mt-5 mb-3" id="background-merah">Cara Ubah Background Foto Jadi Merah Polos</h2>
+
+                <p>Salah satu kesalahan paling sering: background foto warna selain merah polos. <strong>Ini akan ditolak otomatis</strong> oleh sistem face recognition BKN.</p>
+
+                <p>Kalau foto pasfoto lo kebetulan udah background polos (warna lain misal abu-abu atau biru), lo bisa replace ke merah dengan tools online — tanpa perlu reshoot ke studio.</p>
+
+                <p><strong>Tools yang bisa lo pake:</strong></p>
+
+                <ul>
+                    <li><strong><a href="/pas-foto">Pas Foto Maker Kompresin</a></strong> — auto resize ke 4x6 cm + replace background ke merah/biru/putih (segera launch!)</li>
+                    <li><strong>Photoshop / GIMP</strong> — kalau lo familiar editing</li>
+                    <li><strong>Studio foto lokal</strong> — Rp 10rb-25rb buat edit background</li>
+                </ul>
+
+                <p>Rekomendasi: kalau foto lo masih reshoot, <strong>langsung minta studio foto pake background merah polos</strong>. Hasil terbaik daripada edit setelahnya.</p>
+
+                <!-- H2: Tips Lolos Verifikasi -->
+                <h2 class="fw-bold mt-5 mb-3" id="tips-lolos">Tips Lolos Verifikasi Face Recognition BKN</h2>
+
+                <p>Sistem SSCASN sekarang pake <strong>AI face recognition</strong> untuk verifikasi identitas. Foto lo akan otomatis di-scan dan dicocokkan dengan KTP. Kalau sistem AI gagal deteksi wajah, <strong>diskualifikasi otomatis</strong> di tahap administrasi.</p>
+
+                <p>Untuk lolos verifikasi face recognition, ikuti tips berikut:</p>
+
+                <h3 class="fw-bold mt-4 mb-3">1. Pencahayaan Rata di Wajah</h3>
+
+                <p>Hindari shadow gelap di salah satu sisi wajah. Pakai <strong>cahaya dari depan</strong> (di depan jendela atau lampu), bukan dari atas atau samping.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">2. Wajah Menghadap Lurus ke Kamera</h3>
+
+                <p>Jangan miring atau mendongak. Sistem AI butuh detail biometrik wajah dari sudut frontal.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">3. Ekspresi Netral atau Senyum Tipis</h3>
+
+                <p>Mulut tertutup, atau senyum tipis tanpa memperlihatkan gigi. Hindari ekspresi ekstrem.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">4. Tanpa Filter Beauty atau Editing Berlebihan</h3>
+
+                <p>Filter Instagram, beauty filter HP, atau Photoshop editing yang ekstrem akan <strong>gagal verifikasi face recognition</strong>. Foto harus natural — match dengan foto KTP lo.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">5. Resolusi Cukup, Wajah Jelas</h3>
+
+                <p>Minimum dimensi 300×450 pixel. Wajah harus tajam dan fokus, gak buram.</p>
+
+                <h3 class="fw-bold mt-4 mb-3">6. Tanpa Aksesori yang Menutupi Wajah</h3>
+
+                <p>Lepas kacamata gelap, masker, topi. Hijab boleh dipakai, tapi jangan menutupi dahi dan dagu.</p>
+
+                <!-- H2: Kesalahan Fatal -->
+                <h2 class="fw-bold mt-5 mb-3" id="kesalahan-fatal">7 Kesalahan Fatal yang Bikin Foto SSCASN Ditolak</h2>
+
+                <p>Berdasarkan data BKN, ini kesalahan paling sering bikin pelamar <strong>gugur di tahap administrasi</strong> cuma karena foto:</p>
+
+                <ol>
+                    <li><strong>Format file salah</strong> — Upload PNG atau HEIC, padahal harusnya JPG. <em>Otomatis ditolak tanpa notifikasi.</em></li>
+                    <li><strong>Ukuran file > 200 KB</strong> — File kegedean. <em>Solusi: <a href="/">kompres ke target 200KB</a>.</em></li>
+                    <li><strong>Background bukan merah polos</strong> — Pake background warna lain atau ada motif/gradasi.</li>
+                    <li><strong>File corrupt / rusak</strong> — Foto gak bisa dibuka. <em>Solusi: cek dulu di komputer sebelum upload.</em></li>
+                    <li><strong>Filter beauty berlebihan</strong> — AI gagal deteksi wajah natural.</li>
+                    <li><strong>Resolusi terlalu rendah</strong> — Foto pecah saat di-zoom verifikator.</li>
+                    <li><strong>Foto terpotong</strong> — Wajah keluar frame, atau cuma kelihatan setengah.</li>
+                </ol>
+
+                <!-- INLINE CTA -->
+                <div class="alert alert-warning border-0 my-4">
+                    <strong>⚠️ Common mistake:</strong> Banyak yang kompres foto pake aplikasi random dan hasilnya <strong>over target</strong> (misal 250KB padahal max 200KB). Pake <a href="/" class="alert-link">tools yang target spesifik</a> biar hasil pas, gak over.
+                </div>
+
+                <!-- H2: Tools Lain -->
+                <h2 class="fw-bold mt-5 mb-3" id="tools-lain">Tools Lain yang Berguna untuk SSCASN</h2>
+
+                <p>Selain kompres foto, ada beberapa tools lain yang bakal bantu lo proses berkas SSCASN:</p>
+
+                <div class="row g-3 my-4">
+                    <div class="col-md-6">
+                        <a href="/" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-aspect-ratio text-primary"></i> Kompres Foto</h5>
+                                    <p class="text-muted mb-0 small">Pasfoto & swafoto ke 200KB pas. Format JPG.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/kompres-pdf" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-file-earmark-pdf text-danger"></i> Kompres PDF</h5>
+                                    <p class="text-muted mb-0 small">Ijazah & transkrip ke max 800KB. Quality bagus.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/merge-pdf" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-files text-primary"></i> Merge PDF</h5>
+                                    <p class="text-muted mb-0 small">Gabungkan ijazah + transkrip + KTP jadi 1 file.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/pas-foto" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="fw-bold text-dark"><i class="bi bi-person-vcard text-warning"></i> Pas Foto Maker</h5>
+                                    <p class="text-muted mb-0 small">Auto background merah/biru + ukuran 4x6 cm.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- H2: FAQ -->
+                <h2 class="fw-bold mt-5 mb-3" id="faq">Pertanyaan yang Sering Ditanya (FAQ)</h2>
+
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q1">
+                                Apakah ukuran 50 KB juga diterima?
+                            </button>
+                        </h3>
+                        <div id="faq-q1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Iya, diterima.</strong> 200 KB itu batas maksimal, bukan minimum. Asalkan kualitas foto tetap tajam dan wajah jelas, ukuran 50-150 KB juga aman. Tapi kalau foto buram karena over-compress, lebih baik di kisaran 100-200 KB.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q2">
+                                Background pasfoto wajib merah, bukan biru?
+                            </button>
+                        </h3>
+                        <div id="faq-q2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Untuk SSCASN CPNS 2026, <strong>background wajib merah polos</strong>. Background biru biasanya untuk dokumen lain (ijazah, KTP, dll). Aturan tahun-tahun tertentu pernah pake biru untuk yang lahir tahun genap, tapi <strong>standard 2026 adalah merah</strong>. Selalu cek pengumuman resmi instansi yang lo lamar untuk konfirmasi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q3">
+                                Apakah swafoto boleh pakai baju casual?
+                            </button>
+                        </h3>
+                        <div id="faq-q3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Tidak.</strong> Walaupun swafoto lebih longgar dari pasfoto, tetap harus pakai pakaian sopan dan formal. Hindari kaos, tank top, atau pakaian terlalu casual. Recommendasi: kemeja atau blouse warna netral.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q4">
+                                Bisa pakai foto lama yang udah diambil 2-3 tahun lalu?
+                            </button>
+                        </h3>
+                        <div id="faq-q4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Bisa, <strong>asalkan masih mirip dengan kondisi sekarang</strong>. Sistem face recognition akan mencocokkan dengan KTP. Kalau foto terlalu lama dan wajah lo udah berubah signifikan (rambut, jenggot, dll), risiko gagal verifikasi. Recommendasi: foto baru maksimal 1 tahun terakhir.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q5">
+                                Format HEIC dari iPhone diterima?
+                            </button>
+                        </h3>
+                        <div id="faq-q5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Tidak.</strong> Format HEIC (default iPhone) <strong>akan ditolak otomatis</strong> oleh sistem SSCASN. Lo harus convert ke JPG dulu. Caranya: di iPhone, buka Settings → Camera → Formats → pilih "Most Compatible" sebelum foto. Atau convert HEIC ke JPG online.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q6">
+                                Apakah Kompresin.my.id gratis untuk dipakai?
+                            </button>
+                        </h3>
+                        <div id="faq-q6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <strong>Iya, 100% gratis.</strong> Tanpa watermark, tanpa batas pemakaian, tanpa registrasi. Tools kami dibuat khusus untuk membantu pelajar Indonesia, fresh graduate, dan pelamar kerja yang butuh kompres file dengan target ukuran spesifik.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-q7">
+                                Apa yang harus dilakukan kalau foto saya selalu over 200KB?
+                            </button>
+                        </h3>
+                        <div id="faq-q7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Pake tools yang bisa <strong>target ukuran spesifik</strong> kayak <a href="/">Kompresin.my.id</a>. Set target ke 200KB, sistem otomatis akan kompres pas atau di bawah 200KB tanpa over. Hindari tools generic yang cuma kasih opsi "high/medium/low quality" karena hasilnya unpredictable.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Closing -->
+                <h2 class="fw-bold mt-5 mb-3">Selamat Berjuang CPNS 2026!</h2>
+
+                <p>Persiapan foto memang detail. Tapi <strong>1 jam lo siapkan foto sesuai requirement = ribuan jam yg gak terbuang sia-sia</strong> di tahap selanjutnya. Banyak pelamar yg gagal di administrasi cuma karena ribet di foto — jangan sampai lo termasuk yg itu.</p>
+
+                <p>Catat tanggalan pendaftaran resmi di portal <a href="https://sscasn.bkn.go.id" target="_blank" rel="noopener">sscasn.bkn.go.id</a> dan siapkan semua berkas dari sekarang. Good luck, calon ASN!</p>
+
+                <!-- Final CTA -->
+                <div class="card bg-primary text-white border-0 my-5">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <h3 class="fw-bold mb-3">Siap Kompres Foto SSCASN Sekarang?</h3>
+                        <p class="mb-4 opacity-75">Gratis, gak perlu install, gak ada watermark. Hasil pas 200KB.</p>
+                        <a href="/" class="btn btn-light btn-lg">
+                            <i class="bi bi-magic"></i> Mulai Kompres Foto
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article meta -->
+                <div class="border-top pt-4 mt-5">
+                    <small class="text-muted">
+                        <strong>Disclaimer:</strong> Artikel ini disusun berdasarkan informasi resmi dari BKN dan portal SSCASN per {{ article.date }}. Persyaratan resmi dapat berubah sesuai kebijakan terbaru. Selalu cek pengumuman resmi di <a href="https://sscasn.bkn.go.id" target="_blank" rel="noopener">sscasn.bkn.go.id</a> sebelum mendaftar.
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- Schema.org markup buat rich snippet -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ article.title }}",
+    "description": "{{ article.description }}",
+    "author": {
+        "@type": "Organization",
+        "name": "Kompresin.my.id"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Kompresin.my.id"
+    },
+    "datePublished": "{{ article.date }}",
+    "dateModified": "{{ article.date }}"
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Apakah ukuran 50 KB juga diterima untuk foto SSCASN?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Iya, diterima. 200 KB itu batas maksimal, bukan minimum. Asalkan kualitas foto tetap tajam dan wajah jelas, ukuran 50-150 KB juga aman."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Background pasfoto SSCASN wajib merah?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Iya, untuk SSCASN CPNS 2026 background wajib merah polos tanpa gradasi atau motif."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Format HEIC dari iPhone diterima SSCASN?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Tidak. Format HEIC akan ditolak otomatis. Harus convert ke JPG dulu sebelum upload."
+            }
+        }
+    ]
+}
+</script>
+{% endblock %}
