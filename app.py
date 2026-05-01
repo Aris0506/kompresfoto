@@ -12,13 +12,12 @@ Struktur:
 import os
 import io
 import uuid
-import requests  # ← TAMBAHIN INI
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 20MB max upload
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload (buat PDF gede)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['COMPRESSED_FOLDER'] = 'compressed'
 
@@ -116,10 +115,11 @@ def ganti_bg_page():
     return render_template('tool_coming_soon.html', tool_name='Ganti Background Foto', tool_slug='ganti-background')
 
 
+
 @app.route('/kompres-pdf')
 def kompres_pdf_page():
-    """Halaman kompres PDF (Phase 4 - coming soon placeholder)"""
-    return render_template('tool_coming_soon.html', tool_name='Kompres PDF', tool_slug='kompres-pdf')
+    """Halaman kompres PDF - LIVE"""
+    return render_template('kompres-pdf.html')
 
 
 # Existing landing pages
@@ -188,58 +188,142 @@ PASFOTO_COLORS = {
 }
 
 
-@app.route('/api/passport-photo', methods=['POST'])
-def api_passport_photo():
-    """API bikin pas foto."""
+# ============================================================
+# CORE FUNCTION: Compress PDF
+# ============================================================
+def compress_pdf(input_path, output_path, quality='medium'):
+    """
+    Kompres PDF aggresif:
+    - Re-encode SEMUA images dengan quality lebih rendah
+    - Resize images yang resolusi-nya kegedean (>1200px)
+    - Compress streams + remove metadata
+    Quality: 'high' (75 + max 1500px), 'medium' (50 + max 1200px), 'low' (30 + max 900px)
+    """
+    import pikepdf
+    from PIL import Image as PILImage
+    
+    quality_settings = {
+        'high':   {'jpeg_quality': 75, 'max_dim': 1500},
+        'medium': {'jpeg_quality': 50, 'max_dim': 1200},
+        'low':    {'jpeg_quality': 30, 'max_dim': 900},
+    }
+    settings = quality_settings.get(quality, quality_settings['medium'])
+    jpeg_quality = settings['jpeg_quality']
+    max_dim = settings['max_dim']
+    
+    original_size = os.path.getsize(input_path)
+    
+    with pikepdf.open(input_path) as pdf:
+        # Hapus metadata (kadang gede juga)
+        try:
+            with pdf.open_metadata() as meta:
+                meta.clear()
+        except Exception:
+            pass
+        
+        for page in pdf.pages:
+            for image_key in list(page.images.keys()):
+                try:
+                    pdf_image = page.images[image_key]
+                    pil_image = pdf_image.as_pil_image()
+                    
+                    # Skip tiny images (decorative)
+                    if pil_image.width < 50 or pil_image.height < 50:
+                        continue
+                    
+                    # Resize kalau resolusi kegedean
+                    w, h = pil_image.size
+                    if max(w, h) > max_dim:
+                        if w > h:
+                            new_w = max_dim
+                            new_h = int(h * max_dim / w)
+                        else:
+                            new_h = max_dim
+                            new_w = int(w * max_dim / h)
+                        pil_image = pil_image.resize((new_w, new_h), PILImage.LANCZOS)
+                    
+                    # Convert ke RGB (JPEG gak support RGBA)
+                    if pil_image.mode in ('RGBA', 'P', 'LA'):
+                        bg = PILImage.new('RGB', pil_image.size, (255, 255, 255))
+                        if pil_image.mode == 'P':
+                            pil_image = pil_image.convert('RGBA')
+                        bg.paste(pil_image, mask=pil_image.split()[-1] if pil_image.mode in ('RGBA', 'LA') else None)
+                        pil_image = bg
+                    elif pil_image.mode != 'RGB':
+                        pil_image = pil_image.convert('RGB')
+                    
+                    # Re-encode JPEG aggressive
+                    buffer = io.BytesIO()
+                    pil_image.save(buffer, format='JPEG', quality=jpeg_quality, optimize=True, progressive=True)
+                    buffer.seek(0)
+                    
+                    # Replace image di PDF
+                    page.images[image_key].write(
+                        buffer.getvalue(),
+                        filter=pikepdf.Name('/DCTDecode')
+                    )
+                    
+                except Exception:
+                    continue
+        
+        # Save dengan compression maksimal
+        pdf.save(
+            output_path,
+            compress_streams=True,
+            object_stream_mode=pikepdf.ObjectStreamMode.generate,
+            recompress_flate=True,
+            deterministic_id=True,
+        )
+    
+    final_size = os.path.getsize(output_path)
+    return round(original_size / 1024, 2), round(final_size / 1024, 2)
+
+
+@app.route('/api/compress-pdf', methods=['POST'])
+def api_compress_pdf():
+    """API kompres PDF."""
     if 'file' not in request.files:
         return jsonify({'error': 'Gak ada file yang diupload'}), 400
 
     file = request.files['file']
-    if file.filename == '' or not allowed_image(file.filename):
-        return jsonify({'error': 'Pilih foto yang valid (JPG/PNG/WebP)'}), 400
+    if file.filename == '' or not allowed_pdf(file.filename):
+        return jsonify({'error': 'Pilih file PDF yang valid'}), 400
 
-    size_key = request.form.get('size', '3x4')
-    color_key = request.form.get('color', 'merah')
-
-    if size_key not in PASFOTO_SIZES:
-        return jsonify({'error': 'Ukuran gak valid'}), 400
-    if color_key not in PASFOTO_COLORS:
-        return jsonify({'error': 'Warna gak valid'}), 400
+    quality = request.form.get('quality', 'medium')
+    if quality not in ('high', 'medium', 'low'):
+        return jsonify({'error': 'Quality gak valid'}), 400
 
     file_id = str(uuid.uuid4())
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}.{ext}")
+    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}.pdf")
     file.save(upload_path)
 
-    output_filename = f"{file_id}_pasfoto.jpg"
+    output_filename = f"{file_id}_compressed.pdf"
     output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
 
     try:
-        w, h = make_passport_photo(
-            upload_path, output_path,
-            PASFOTO_SIZES[size_key],
-            PASFOTO_COLORS[color_key]
-        )
+        original_kb, final_kb = compress_pdf(upload_path, output_path, quality)
     except Exception as e:
         try:
             os.remove(upload_path)
         except OSError:
             pass
-        return jsonify({'error': f'Gagal proses: {str(e)}'}), 500
+        return jsonify({'error': f'Gagal kompres PDF: {str(e)}'}), 500
 
     try:
         os.remove(upload_path)
     except OSError:
         pass
+    
+    reduction = round((1 - final_kb / original_kb) * 100, 1) if original_kb > 0 else 0
 
     return jsonify({
         'success': True,
-        'size': f'{size_key} cm',
-        'color': color_key,
-        'pixels': f'{w}x{h}',
+        'original_size_kb': original_kb,
+        'final_size_kb': final_kb,
+        'reduction_percent': reduction,
+        'quality': quality,
         'download_url': f'/download/{output_filename}'
     })
-
 
 # ============================================================
 # ROUTES: API Endpoints
