@@ -105,8 +105,8 @@ def index():
 
 @app.route('/pas-foto')
 def pas_foto_page():
-    """Halaman pas foto (Phase 2 - coming soon placeholder)"""
-    return render_template('tool_coming_soon.html', tool_name='Pas Foto Maker', tool_slug='pas-foto')
+    """Halaman pas foto - LIVE"""
+    return render_template('pas-foto.html')
 
 
 @app.route('/ganti-background')
@@ -130,6 +130,123 @@ def cpns_landing():
 @app.route('/lamaran-kerja')
 def lamaran_landing():
     return render_template('lamaran.html')
+
+
+
+
+# ============================================================
+# CORE FUNCTION: Pas Foto Maker
+# ============================================================
+def make_passport_photo(image_path, output_path, size_cm, bg_color_rgb):
+    """
+    Bikin pas foto:
+    - Resize ke ukuran cm yang dipilih (DPI 300)
+    - Replace background dengan warna pilihan
+    """
+    # Konversi cm ke pixel (DPI 300)
+    DPI = 300
+    width_cm, height_cm = size_cm
+    target_w = int((width_cm / 2.54) * DPI)
+    target_h = int((height_cm / 2.54) * DPI)
+    
+    img = Image.open(image_path).convert('RGBA')
+    
+    # Replace background sederhana: deteksi warna dominan di pojok atas
+    # (asumsi foto user udah punya background polos)
+    pixels = img.load()
+    corner_color = pixels[5, 5]  # ambil sample dari pojok kiri atas
+    
+    # Buat layer baru dengan background warna pilihan
+    new_bg = Image.new('RGB', img.size, bg_color_rgb)
+    
+    # Deteksi pixel yang mirip dengan corner_color (background lama)
+    # tolerance: 50 (cukup forgiving buat foto bg polos)
+    tolerance = 60
+    img_rgb = img.convert('RGB')
+    pixels_rgb = img_rgb.load()
+    new_pixels = new_bg.load()
+    
+    for y in range(img.height):
+        for x in range(img.width):
+            pr, pg, pb = pixels_rgb[x, y]
+            cr, cg, cb = corner_color[:3]
+            # Kalau pixel beda dari background lama → keep (subject)
+            if abs(pr - cr) > tolerance or abs(pg - cg) > tolerance or abs(pb - cb) > tolerance:
+                new_pixels[x, y] = (pr, pg, pb)
+    
+    # Resize ke ukuran final
+    final = new_bg.resize((target_w, target_h), Image.LANCZOS)
+    final.save(output_path, format='JPEG', quality=95, dpi=(DPI, DPI))
+    
+    return target_w, target_h
+
+
+# Mapping ukuran cm
+PASFOTO_SIZES = {
+    '2x3': (2, 3),
+    '3x4': (3, 4),
+    '4x6': (4, 6),
+}
+
+# Mapping warna background
+PASFOTO_COLORS = {
+    'merah': (220, 30, 30),
+    'biru': (30, 80, 200),
+    'putih': (255, 255, 255),
+}
+
+
+@app.route('/api/passport-photo', methods=['POST'])
+def api_passport_photo():
+    """API bikin pas foto."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'Gak ada file yang diupload'}), 400
+
+    file = request.files['file']
+    if file.filename == '' or not allowed_image(file.filename):
+        return jsonify({'error': 'Pilih foto yang valid (JPG/PNG/WebP)'}), 400
+
+    size_key = request.form.get('size', '3x4')
+    color_key = request.form.get('color', 'merah')
+
+    if size_key not in PASFOTO_SIZES:
+        return jsonify({'error': 'Ukuran gak valid'}), 400
+    if color_key not in PASFOTO_COLORS:
+        return jsonify({'error': 'Warna gak valid'}), 400
+
+    file_id = str(uuid.uuid4())
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}.{ext}")
+    file.save(upload_path)
+
+    output_filename = f"{file_id}_pasfoto.jpg"
+    output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
+
+    try:
+        w, h = make_passport_photo(
+            upload_path, output_path,
+            PASFOTO_SIZES[size_key],
+            PASFOTO_COLORS[color_key]
+        )
+    except Exception as e:
+        try:
+            os.remove(upload_path)
+        except OSError:
+            pass
+        return jsonify({'error': f'Gagal proses: {str(e)}'}), 500
+
+    try:
+        os.remove(upload_path)
+    except OSError:
+        pass
+
+    return jsonify({
+        'success': True,
+        'size': f'{size_key} cm',
+        'color': color_key,
+        'pixels': f'{w}x{h}',
+        'download_url': f'/download/{output_filename}'
+    })
 
 
 # ============================================================
