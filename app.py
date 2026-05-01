@@ -121,6 +121,11 @@ def kompres_pdf_page():
     """Halaman kompres PDF - LIVE"""
     return render_template('kompres-pdf.html')
 
+@app.route('/merge-pdf')
+def merge_pdf_page():
+    """Halaman merge PDF - LIVE"""
+    return render_template('merge-pdf.html')
+
 
 # Existing landing pages
 @app.route('/cpns')
@@ -325,6 +330,75 @@ def api_compress_pdf():
         'download_url': f'/download/{output_filename}'
     })
 
+
+
+@app.route('/api/merge-pdf', methods=['POST'])
+def api_merge_pdf():
+    """API gabungin beberapa PDF jadi 1."""
+    import pikepdf
+    
+    files = request.files.getlist('files')
+    
+    if not files or len(files) < 2:
+        return jsonify({'error': 'Minimal 2 file PDF buat di-merge'}), 400
+    
+    if len(files) > 10:
+        return jsonify({'error': 'Max 10 file sekaligus'}), 400
+    
+    # Validate semua file PDF
+    for f in files:
+        if not allowed_pdf(f.filename):
+            return jsonify({'error': f'File "{f.filename}" bukan PDF'}), 400
+    
+    # Save semua upload
+    file_id = str(uuid.uuid4())
+    upload_paths = []
+    
+    for idx, f in enumerate(files):
+        path = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}_{idx}.pdf")
+        f.save(path)
+        upload_paths.append(path)
+    
+    output_filename = f"{file_id}_merged.pdf"
+    output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
+    
+    try:
+        # Open PDF pertama, append yang lain
+        merged = pikepdf.Pdf.new()
+        for path in upload_paths:
+            with pikepdf.open(path) as src:
+                merged.pages.extend(src.pages)
+        
+        merged.save(output_path, compress_streams=True)
+        merged.close()
+        
+        total_pages = sum(len(pikepdf.open(p).pages) for p in upload_paths)
+        final_size_kb = round(os.path.getsize(output_path) / 1024, 2)
+        
+    except Exception as e:
+        # Cleanup uploads
+        for path in upload_paths:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+        return jsonify({'error': f'Gagal merge: {str(e)}'}), 500
+    
+    # Cleanup uploads (success case)
+    for path in upload_paths:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+    
+    return jsonify({
+        'success': True,
+        'file_count': len(files),
+        'total_pages': total_pages,
+        'final_size_kb': final_size_kb,
+        'download_url': f'/download/{output_filename}'
+    })
+
 # ============================================================
 # ROUTES: API Endpoints
 # ============================================================
@@ -428,6 +502,7 @@ def sitemap():
         {'loc': 'https://kompresin.my.id/pas-foto', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/ganti-background', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/kompres-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
+        {'loc': 'https://kompresin.my.id/merge-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/cpns', 'priority': '0.8', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/lamaran-kerja', 'priority': '0.8', 'changefreq': 'monthly'},
     ]

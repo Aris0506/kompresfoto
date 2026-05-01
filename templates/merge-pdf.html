@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Merge PDF Online Gratis - Gabungkan Beberapa PDF Jadi Satu | Kompresin.my.id{% endblock %}
+{% block description %}Gabungkan beberapa file PDF jadi satu file dengan urutan yang lo mau. Cocok buat upload SSCASN (ijazah + transkrip + KTP), berkas lamaran, dokumen kuliah. Gratis tanpa watermark.{% endblock %}
+
+{% block content %}
+<section class="hero py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-5 fw-bold mb-3">Gabungkan PDF <span class="text-primary">Sekali Klik</span></h1>
+                <p class="lead text-muted">Upload beberapa PDF, atur urutannya, gabungkan jadi 1 file. Pas buat upload SSCASN (ijazah + transkrip + KTP jadi 1), berkas lamaran kerja, atau gabungin chapter skripsi. <strong>Gratis & tanpa watermark.</strong></p>
+                <div class="d-flex gap-2 justify-content-center justify-content-lg-start flex-wrap mt-3">
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Max 10 file</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Atur urutan</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Tanpa watermark</span>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <i class="bi bi-files text-primary" style="font-size: 10rem; opacity: 0.15;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+
+                        <!-- Upload area -->
+                        <div id="uploadZone" class="upload-zone text-center p-5 mb-4">
+                            <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                            <h4 class="mb-2">Drop PDF di sini atau klik untuk pilih</h4>
+                            <p class="text-muted mb-0">Bisa pilih beberapa sekaligus — Max 10 file (50MB total)</p>
+                            <input type="file" id="fileInput" accept="application/pdf" multiple hidden>
+                        </div>
+
+                        <!-- Files list -->
+                        <div id="filesList" class="d-none mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0 fw-semibold">File yang akan digabungkan:</h6>
+                                <small class="text-muted"><i class="bi bi-arrows-move"></i> Drag buat ubah urutan</small>
+                            </div>
+                            <div id="filesItems" class="list-group"></div>
+                            <div class="mt-3 text-end">
+                                <button class="btn btn-sm btn-outline-primary" id="addMoreBtn">
+                                    <i class="bi bi-plus-lg"></i> Tambah PDF lagi
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action button -->
+                        <button class="btn btn-primary btn-lg w-100" id="mergeBtn" disabled>
+                            <i class="bi bi-magic"></i> Gabungkan PDF
+                        </button>
+
+                        <!-- Loading -->
+                        <div id="loadingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-3 mb-0">Lagi gabungin... bentar ya</p>
+                        </div>
+
+                        <!-- Result -->
+                        <div id="resultState" class="d-none mt-4">
+                            <div class="alert alert-success border-0">
+                                <h5 class="alert-heading"><i class="bi bi-check-circle-fill"></i> Sukses!</h5>
+                                <div class="row text-center mt-3">
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">File digabung</small>
+                                        <strong id="resultFileCount">-</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Total halaman</small>
+                                        <strong id="resultPages">-</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Ukuran hasil</small>
+                                        <strong id="resultSize" class="text-primary">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
+                                <i class="bi bi-download"></i> Download PDF Gabungan
+                            </a>
+                            <button class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
+                                <i class="bi bi-arrow-clockwise"></i> Gabungin PDF Lain
+                            </button>
+                        </div>
+
+                        <!-- Error -->
+                        <div id="errorState" class="alert alert-danger d-none mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
+                <div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
+                    <small class="text-muted d-block mb-2">Iklan</small>
+                    <div style="display: flex; justify-content: center;">
+                        <script type="text/javascript">
+                            atOptions = {
+                                'key' : 'd4c1966bed2135f18595a1ed7645db4b',
+                                'format' : 'iframe',
+                                'height' : 250,
+                                'width' : 300,
+                                'params' : {}
+                            };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
+                    </div>
+                </div>
+
+                <!-- Cross-link ke Kompres PDF (anti-malas Indo!) -->
+                <div class="card border-0 bg-light mt-4">
+                    <div class="card-body p-4 text-center">
+                        <h6 class="fw-semibold mb-2"><i class="bi bi-lightbulb text-warning"></i> PDF gabungan kegedean?</h6>
+                        <p class="text-muted small mb-3">Setelah merge, kalau ukurannya kegedean buat upload, kompres dulu biar pas.</p>
+                        <a href="/kompres-pdf" class="btn btn-outline-primary">
+                            <i class="bi bi-file-earmark-zip"></i> Kompres PDF →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tips section (good for SEO) -->
+                <div class="mt-5">
+                    <h3 class="fw-bold mb-3">Tips Merge PDF</h3>
+                    <ul class="text-muted">
+                        <li><strong>Untuk SSCASN/CPNS</strong>: Gabungin ijazah + transkrip + KTP + surat lamaran jadi 1 file PDF biar gampang upload.</li>
+                        <li><strong>Untuk lamaran kerja</strong>: Gabungin CV + portfolio + sertifikat jadi 1 file biar HRD gak ribet.</li>
+                        <li><strong>Untuk kuliah</strong>: Gabungin chapter skripsi (BAB 1-5) jadi 1 file lengkap.</li>
+                        <li><strong>Atur urutan dulu</strong> sebelum klik Gabungkan — drag file ke atas/bawah sesuai urutan yang lo mau.</li>
+                        <li><strong>Hasil PDF gabungan kegedean?</strong> Kompres dulu pakai <a href="/kompres-pdf">Kompres PDF</a> biar muat di portal upload.</li>
+                    </ul>
+
+                    <h4 class="fw-bold mt-4">Kapan Butuh Merge PDF?</h4>
+                    <ul class="text-muted">
+                        <li>Upload dokumen ke SSCASN yang minta "1 file PDF berisi semua berkas"</li>
+                        <li>Email lamaran kerja yang minta CV + portfolio dalam 1 attachment</li>
+                        <li>Submit tugas kuliah yang ada beberapa file PDF terpisah</li>
+                        <li>Bikin file dokumentasi proyek yang lengkap dari beberapa sumber</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Sortable.js untuk drag & drop reorder -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+(function() {
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const filesList = document.getElementById('filesList');
+    const filesItems = document.getElementById('filesItems');
+    const addMoreBtn = document.getElementById('addMoreBtn');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const loadingState = document.getElementById('loadingState');
+    const resultState = document.getElementById('resultState');
+    const errorState = document.getElementById('errorState');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const adSlotResult = document.getElementById('adSlotResult');
+
+    let selectedFiles = []; // array of File objects
+
+    function formatSize(bytes) {
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function renderFilesList() {
+        filesItems.innerHTML = selectedFiles.map((file, idx) => `
+            <div class="list-group-item d-flex align-items-center" data-idx="${idx}">
+                <i class="bi bi-grip-vertical text-muted me-2" style="cursor: grab;"></i>
+                <i class="bi bi-file-earmark-pdf text-danger me-3 fs-4"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">${idx + 1}. ${file.name}</div>
+                    <small class="text-muted">${formatSize(file.size)}</small>
+                </div>
+                <button class="btn btn-sm btn-outline-danger remove-file-btn" data-idx="${idx}">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        `).join('');
+
+        // Attach remove handlers
+        document.querySelectorAll('.remove-file-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx);
+                selectedFiles.splice(idx, 1);
+                if (selectedFiles.length === 0) {
+                    resetAll();
+                } else {
+                    renderFilesList();
+                    updateMergeBtn();
+                }
+            });
+        });
+
+        // Init Sortable for drag & drop reorder
+        if (window.Sortable) {
+            Sortable.create(filesItems, {
+                animation: 150,
+                handle: '.bi-grip-vertical',
+                onEnd: (evt) => {
+                    // Reorder selectedFiles array based on new DOM order
+                    const newOrder = [];
+                    document.querySelectorAll('#filesItems .list-group-item').forEach(item => {
+                        newOrder.push(selectedFiles[parseInt(item.dataset.idx)]);
+                    });
+                    selectedFiles = newOrder;
+                    renderFilesList();
+                }
+            });
+        }
+    }
+
+    function updateMergeBtn() {
+        mergeBtn.disabled = selectedFiles.length < 2;
+        if (selectedFiles.length < 2) {
+            mergeBtn.innerHTML = '<i class="bi bi-magic"></i> Pilih minimal 2 PDF';
+        } else {
+            mergeBtn.innerHTML = `<i class="bi bi-magic"></i> Gabungkan ${selectedFiles.length} PDF`;
+        }
+    }
+
+    function addFiles(fileList) {
+        for (const file of fileList) {
+            if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                showError(`File "${file.name}" bukan PDF, dilewati`);
+                continue;
+            }
+            if (selectedFiles.length >= 10) {
+                showError('Max 10 file');
+                break;
+            }
+            selectedFiles.push(file);
+        }
+
+        if (selectedFiles.length > 0) {
+            uploadZone.classList.add('d-none');
+            filesList.classList.remove('d-none');
+            renderFilesList();
+            updateMergeBtn();
+        }
+    }
+
+    function resetAll() {
+        selectedFiles = [];
+        fileInput.value = '';
+        uploadZone.classList.remove('d-none');
+        filesList.classList.add('d-none');
+        resultState.classList.add('d-none');
+        errorState.classList.add('d-none');
+        adSlotResult.classList.add('d-none');
+        mergeBtn.classList.remove('d-none');
+        mergeBtn.disabled = true;
+        mergeBtn.innerHTML = '<i class="bi bi-magic"></i> Gabungkan PDF';
+    }
+
+    function showError(msg) {
+        errorState.textContent = msg;
+        errorState.classList.remove('d-none');
+        setTimeout(() => errorState.classList.add('d-none'), 4000);
+    }
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    addMoreBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) addFiles(e.target.files);
+        fileInput.value = ''; // reset biar bisa pilih file yg sama lagi
+    });
+
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+    });
+
+    resetBtn.addEventListener('click', resetAll);
+
+    mergeBtn.addEventListener('click', async () => {
+        if (selectedFiles.length < 2) return;
+
+        mergeBtn.classList.add('d-none');
+        loadingState.classList.remove('d-none');
+        errorState.classList.add('d-none');
+
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('files', file));
+
+        try {
+            const res = await fetch('/api/merge-pdf', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            loadingState.classList.add('d-none');
+
+            if (!res.ok || !data.success) {
+                showError(data.error || 'Gagal merge PDF, coba lagi');
+                mergeBtn.classList.remove('d-none');
+                return;
+            }
+
+            document.getElementById('resultFileCount').textContent = data.file_count + ' file';
+            document.getElementById('resultPages').textContent = data.total_pages + ' halaman';
+            document.getElementById('resultSize').textContent = formatSize(data.final_size_kb * 1024);
+            downloadBtn.href = data.download_url;
+            resultState.classList.remove('d-none');
+            adSlotResult.classList.remove('d-none');
+        } catch (err) {
+            showError('Network error, coba refresh ya');
+            mergeBtn.classList.remove('d-none');
+        }
+    });
+})();
+</script>
+{% endblock %}
