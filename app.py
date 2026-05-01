@@ -198,87 +198,53 @@ PASFOTO_COLORS = {
 # ============================================================
 def compress_pdf(input_path, output_path, quality='medium'):
     """
-    Kompres PDF aggresif:
-    - Re-encode SEMUA images dengan quality lebih rendah
-    - Resize images yang resolusi-nya kegedean (>1200px)
-    - Compress streams + remove metadata
-    Quality: 'high' (75 + max 1500px), 'medium' (50 + max 1200px), 'low' (30 + max 900px)
+    Kompres PDF pake Ghostscript (industry standard, dipake ILovePDF/SmallPDF).
+    Quality: 'high' (printer), 'medium' (ebook), 'low' (screen)
     """
-    import pikepdf
-    from PIL import Image as PILImage
+    import subprocess
     
-    quality_settings = {
-        'high':   {'jpeg_quality': 75, 'max_dim': 1500},
-        'medium': {'jpeg_quality': 50, 'max_dim': 1200},
-        'low':    {'jpeg_quality': 30, 'max_dim': 900},
+    # Ghostscript quality presets (nama di Ghostscript)
+    gs_quality_map = {
+        'high': '/printer',     # 300 DPI, kualitas printer
+        'medium': '/ebook',     # 150 DPI, balanced (recommended)
+        'low': '/screen',       # 72 DPI, kompresi maksimal
     }
-    settings = quality_settings.get(quality, quality_settings['medium'])
-    jpeg_quality = settings['jpeg_quality']
-    max_dim = settings['max_dim']
+    pdf_setting = gs_quality_map.get(quality, '/ebook')
     
     original_size = os.path.getsize(input_path)
     
-    with pikepdf.open(input_path) as pdf:
-        # Hapus metadata (kadang gede juga)
-        try:
-            with pdf.open_metadata() as meta:
-                meta.clear()
-        except Exception:
-            pass
-        
-        for page in pdf.pages:
-            for image_key in list(page.images.keys()):
-                try:
-                    pdf_image = page.images[image_key]
-                    pil_image = pdf_image.as_pil_image()
-                    
-                    # Skip tiny images (decorative)
-                    if pil_image.width < 50 or pil_image.height < 50:
-                        continue
-                    
-                    # Resize kalau resolusi kegedean
-                    w, h = pil_image.size
-                    if max(w, h) > max_dim:
-                        if w > h:
-                            new_w = max_dim
-                            new_h = int(h * max_dim / w)
-                        else:
-                            new_h = max_dim
-                            new_w = int(w * max_dim / h)
-                        pil_image = pil_image.resize((new_w, new_h), PILImage.LANCZOS)
-                    
-                    # Convert ke RGB (JPEG gak support RGBA)
-                    if pil_image.mode in ('RGBA', 'P', 'LA'):
-                        bg = PILImage.new('RGB', pil_image.size, (255, 255, 255))
-                        if pil_image.mode == 'P':
-                            pil_image = pil_image.convert('RGBA')
-                        bg.paste(pil_image, mask=pil_image.split()[-1] if pil_image.mode in ('RGBA', 'LA') else None)
-                        pil_image = bg
-                    elif pil_image.mode != 'RGB':
-                        pil_image = pil_image.convert('RGB')
-                    
-                    # Re-encode JPEG aggressive
-                    buffer = io.BytesIO()
-                    pil_image.save(buffer, format='JPEG', quality=jpeg_quality, optimize=True, progressive=True)
-                    buffer.seek(0)
-                    
-                    # Replace image di PDF
-                    page.images[image_key].write(
-                        buffer.getvalue(),
-                        filter=pikepdf.Name('/DCTDecode')
-                    )
-                    
-                except Exception:
-                    continue
-        
-        # Save dengan compression maksimal
-        pdf.save(
-            output_path,
-            compress_streams=True,
-            object_stream_mode=pikepdf.ObjectStreamMode.generate,
-            recompress_flate=True,
-            deterministic_id=True,
+    # Build Ghostscript command
+    gs_cmd = [
+        'gs',
+        '-sDEVICE=pdfwrite',
+        '-dCompatibilityLevel=1.4',
+        f'-dPDFSETTINGS={pdf_setting}',
+        '-dNOPAUSE',
+        '-dQUIET',
+        '-dBATCH',
+        '-dDetectDuplicateImages=true',
+        '-dCompressFonts=true',
+        '-dSubsetFonts=true',
+        f'-sOutputFile={output_path}',
+        input_path
+    ]
+    
+    try:
+        result = subprocess.run(
+            gs_cmd,
+            capture_output=True,
+            timeout=120,  # max 2 menit per file
+            check=True
         )
+    except subprocess.TimeoutExpired:
+        raise Exception('Proses kompresi terlalu lama, file mungkin terlalu kompleks')
+    except subprocess.CalledProcessError as e:
+        raise Exception(f'Ghostscript error: {e.stderr.decode()[:200]}')
+    except FileNotFoundError:
+        raise Exception('Ghostscript belum ke-install di server. Hubungi admin.')
+    
+    if not os.path.exists(output_path):
+        raise Exception('File hasil kompresi tidak terbentuk')
     
     final_size = os.path.getsize(output_path)
     return round(original_size / 1024, 2), round(final_size / 1024, 2)
