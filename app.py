@@ -380,7 +380,7 @@ def robots():
 
 @app.errorhandler(413)
 def too_large(e):
-    return jsonify({'error': 'File kegedean (max 20MB)'}), 413
+    return jsonify({'error': 'File kegedean (max 5MB)'}), 413
 
 
 if __name__ == '__main__':
