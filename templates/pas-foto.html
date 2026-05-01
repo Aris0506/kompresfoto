@@ -32,7 +32,7 @@
 
                         <!-- Tip box -->
                         <div class="alert alert-info border-0 mb-4">
-                            <i class="bi bi-info-circle-fill"></i> <strong>Tips:</strong> Untuk hasil terbaik, upload foto dengan background polos (warna 1 saja). Tools ini bakal ganti background lama dengan warna pilihan lo.
+                            <i class="bi bi-info-circle-fill"></i> <strong>Tips:</strong> Smart AI kami auto-deteksi wajah & badan lo, terus ganti background-nya dengan warna pilihan. Foto outdoor / background ramai juga bisa!
                         </div>
 
                         <!-- Upload area -->
@@ -79,31 +79,49 @@
                             </div>
                         </div>
 
-                        <!-- Pilih warna background -->
+                        <!-- Mode Background: Manual vs AI -->
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Warna Background</label>
+                            <label class="form-label fw-semibold">Mode Background</label>
                             <div class="row g-2">
-                                <div class="col-4">
-                                    <button type="button" class="btn w-100 color-btn active" data-color="merah" style="background-color: #dc1e1e; color: white; border: 2px solid #dc1e1e;">
-                                        <strong>Merah</strong><br><small>Tahun ganjil</small>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-primary w-100 mode-btn active" data-mode="manual">
+                                        <i class="bi bi-droplet-fill"></i> <strong>Manual</strong><br>
+                                        <small>Foto bg polos → ganti warna</small>
                                     </button>
                                 </div>
-                                <div class="col-4">
-                                    <button type="button" class="btn w-100 color-btn" data-color="biru" style="background-color: #1e50c8; color: white; border: 2px solid #1e50c8;">
-                                        <strong>Biru</strong><br><small>Tahun genap</small>
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button type="button" class="btn w-100 color-btn" data-color="putih" style="background-color: white; color: #333; border: 2px solid #ccc;">
-                                        <strong>Putih</strong><br><small>Umum</small>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-secondary w-100 mode-btn" data-mode="ai" disabled>
+                                        <i class="bi bi-stars"></i> <strong>AI Auto Remove</strong><br>
+                                        <small><span class="badge bg-warning text-dark">Coming Soon</span></small>
                                     </button>
                                 </div>
                             </div>
                             <small class="text-muted d-block mt-2">
-                                <i class="bi bi-info-circle"></i> Background merah/biru sesuai aturan SSCASN
+                                <i class="bi bi-info-circle"></i> <strong>Manual</strong>: cocok buat foto background polos. <strong>AI</strong>: bisa untuk foto apapun (segera hadir).
                             </small>
                         </div>
 
+                        <!-- Mode Background: Smart AI vs Premium AI -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Mode Background</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-primary w-100 mode-btn active" data-mode="smart">
+                                        <i class="bi bi-magic"></i> <strong>Smart AI</strong><br>
+                                        <small>Auto remove background</small>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-secondary w-100 mode-btn" data-mode="premium" disabled>
+                                        <i class="bi bi-stars"></i> <strong>Premium AI</strong><br>
+                                        <small><span class="badge bg-warning text-dark">Coming Soon</span></small>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> <strong>Smart AI</strong>: bisa untuk foto apapun, hasil rapi. <strong>Premium AI</strong>: kualitas studio profesional (segera hadir).
+                            </small>
+                        </div>
                         <!-- Action button -->
                         <button class="btn btn-primary btn-lg w-100" id="processBtn" disabled>
                             <i class="bi bi-magic"></i> Bikin Pas Foto

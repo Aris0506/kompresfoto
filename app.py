@@ -12,6 +12,7 @@ Struktur:
 import os
 import io
 import uuid
+import requests  # ← TAMBAHIN INI
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image
 from werkzeug.utils import secure_filename
@@ -139,43 +140,48 @@ def lamaran_landing():
 # ============================================================
 def make_passport_photo(image_path, output_path, size_cm, bg_color_rgb):
     """
-    Bikin pas foto:
-    - Resize ke ukuran cm yang dipilih (DPI 300)
-    - Replace background dengan warna pilihan
+    Bikin pas foto pake remove.bg API:
+    - Auto AI remove background
+    - Replace dengan warna pilihan
+    - Resize ke ukuran cm (DPI 300)
     """
-    # Konversi cm ke pixel (DPI 300)
     DPI = 300
     width_cm, height_cm = size_cm
     target_w = int((width_cm / 2.54) * DPI)
     target_h = int((height_cm / 2.54) * DPI)
     
-    img = Image.open(image_path).convert('RGBA')
+    # Call remove.bg API
+    api_key = os.environ.get('REMOVEBG_API_KEY', '')
+    if not api_key:
+        raise Exception('API key Smart AI belum di-set. Hubungi admin.')
     
-    # Replace background sederhana: deteksi warna dominan di pojok atas
-    # (asumsi foto user udah punya background polos)
-    pixels = img.load()
-    corner_color = pixels[5, 5]  # ambil sample dari pojok kiri atas
+    with open(image_path, 'rb') as img_file:
+        response = requests.post(
+            'https://api.remove.bg/v1.0/removebg',
+            files={'image_file': img_file},
+            data={'size': 'auto'},
+            headers={'X-Api-Key': api_key},
+            timeout=30
+        )
     
-    # Buat layer baru dengan background warna pilihan
-    new_bg = Image.new('RGB', img.size, bg_color_rgb)
+    if response.status_code == 402:
+        raise Exception('Quota Smart AI bulan ini habis. Coba bulan depan ya, atau tunggu Premium AI segera hadir!')
+    elif response.status_code == 403:
+        raise Exception('API key invalid. Hubungi admin.')
+    elif response.status_code != 200:
+        raise Exception(f'Gagal proses AI (error {response.status_code}). Coba lagi nanti.')
     
-    # Deteksi pixel yang mirip dengan corner_color (background lama)
-    # tolerance: 50 (cukup forgiving buat foto bg polos)
-    tolerance = 60
-    img_rgb = img.convert('RGB')
-    pixels_rgb = img_rgb.load()
-    new_pixels = new_bg.load()
+    # Buka hasil dari remove.bg (PNG transparent)
+    foreground = Image.open(io.BytesIO(response.content)).convert('RGBA')
     
-    for y in range(img.height):
-        for x in range(img.width):
-            pr, pg, pb = pixels_rgb[x, y]
-            cr, cg, cb = corner_color[:3]
-            # Kalau pixel beda dari background lama → keep (subject)
-            if abs(pr - cr) > tolerance or abs(pg - cg) > tolerance or abs(pb - cb) > tolerance:
-                new_pixels[x, y] = (pr, pg, pb)
+    # Bikin background dengan warna pilihan
+    background = Image.new('RGB', foreground.size, bg_color_rgb)
     
-    # Resize ke ukuran final
-    final = new_bg.resize((target_w, target_h), Image.LANCZOS)
+    # Composite foreground (subject) di atas background warna
+    background.paste(foreground, mask=foreground.split()[3])  # use alpha channel as mask
+    
+    # Resize ke ukuran final pas foto
+    final = background.resize((target_w, target_h), Image.LANCZOS)
     final.save(output_path, format='JPEG', quality=95, dpi=(DPI, DPI))
     
     return target_w, target_h
