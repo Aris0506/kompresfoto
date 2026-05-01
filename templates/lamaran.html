@@ -1,49 +1,34 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kompres Foto Lamaran Kerja - 500KB / 1MB Online | Kompresin.my.id</title>
-    <meta name="description" content="Kompres foto lamaran kerja sesuai ukuran job portal. JobStreet, LinkedIn, Glints, Kalibrr - semua bisa. Gratis tanpa watermark.">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/">
-                <i class="bi bi-magic text-primary"></i> Kompresin<span class="text-muted">.my.id</span>
-            </a>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <section class="py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-9">
-                    <h1 class="fw-bold mb-3">Kompres Foto untuk Lamaran Kerja</h1>
-                    <p class="lead text-muted">Setiap portal lowongan punya batasan ukuran foto sendiri. Tool ini bantuin lo bikin foto pas sesuai requirement.</p>
-                    
-                    <div class="alert alert-info border-0 my-4">
-                        <h5><i class="bi bi-info-circle"></i> Ukuran Foto di Berbagai Job Portal</h5>
-                        <ul class="mb-0">
-                            <li><strong>JobStreet:</strong> Max 1 MB</li>
-                            <li><strong>LinkedIn (profile):</strong> Max 8 MB, recommended 400x400px</li>
-                            <li><strong>Glints:</strong> Max 2 MB</li>
-                            <li><strong>Kalibrr:</strong> Max 5 MB</li>
-                            <li><strong>Email lamaran ke HRD:</strong> Best practice di bawah 500 KB biar gak fullin inbox</li>
-                        </ul>
-                    </div>
+{% block title %}Kompres Foto Lamaran Kerja - 500KB / 1MB Online | Kompresin.my.id{% endblock %}
+{% block description %}Kompres foto lamaran kerja sesuai ukuran job portal. JobStreet, LinkedIn, Glints, Kalibrr - semua bisa. Gratis tanpa watermark.{% endblock %}
 
-                    <div class="text-center my-5">
-                        <a href="/" class="btn btn-primary btn-lg">
-                            <i class="bi bi-magic"></i> Mulai Kompres Foto
-                        </a>
-                    </div>
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <h1 class="fw-bold mb-3">Kompres Foto untuk Lamaran Kerja</h1>
+                <p class="lead text-muted">Setiap portal lowongan punya batasan ukuran foto sendiri. Tool ini bantuin lo bikin foto pas sesuai requirement.</p>
+                
+                <div class="alert alert-info border-0 my-4">
+                    <h5><i class="bi bi-info-circle"></i> Ukuran Foto di Berbagai Job Portal</h5>
+                    <ul class="mb-0">
+                        <li><strong>JobStreet:</strong> Max 1 MB</li>
+                        <li><strong>LinkedIn (profile):</strong> Max 8 MB, recommended 400x400px</li>
+                        <li><strong>Glints:</strong> Max 2 MB</li>
+                        <li><strong>Kalibrr:</strong> Max 5 MB</li>
+                        <li><strong>Email lamaran ke HRD:</strong> Best practice di bawah 500 KB biar gak fullin inbox</li>
+                    </ul>
+                </div>
+
+                <div class="text-center my-5">
+                    <a href="/kompres-foto" class="btn btn-primary btn-lg">
+                        <i class="bi bi-magic"></i> Mulai Kompres Foto
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
-</body>
-</html>
+    </div>
+</section>
+{% endblock %}

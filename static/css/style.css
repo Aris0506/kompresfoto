@@ -1,6 +1,10 @@
 :root {
     --primary: #0d6efd;
     --primary-soft: #e7f1ff;
+    --warning-soft: #fff3cd;
+    --info-soft: #cff4fc;
+    --danger-soft: #f8d7da;
+    --success-soft: #d1e7dd;
 }
 
 body {
@@ -9,10 +13,27 @@ body {
     color: #1a1a1a;
 }
 
-.hero {
+.hero-smart {
     background: linear-gradient(135deg, #ffffff 0%, var(--primary-soft) 100%);
 }
 
+/* Smart Upload Zone (homepage) */
+.upload-zone-large {
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 3rem 1.5rem;
+    background-color: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-zone-large:hover, .upload-zone-large.dragover {
+    border-color: var(--primary);
+    background-color: var(--primary-soft);
+    transform: translateY(-2px);
+}
+
+/* Regular Upload Zone (tool pages) */
 .upload-zone {
     border: 2px dashed #cbd5e1;
     border-radius: 12px;
@@ -26,6 +47,61 @@ body {
     background-color: var(--primary-soft);
 }
 
+/* Tool Cards */
+.tool-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+}
+
+.tool-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.bg-primary-soft { background-color: var(--primary-soft); }
+.bg-warning-soft { background-color: var(--warning-soft); }
+.bg-info-soft { background-color: var(--info-soft); }
+.bg-danger-soft { background-color: var(--danger-soft); }
+.bg-success-soft { background-color: var(--success-soft); }
+
+.text-success { color: #198754 !important; }
+
+/* Smart options buttons */
+.smart-option-btn {
+    width: 100%;
+    padding: 1.25rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 12px;
+    text-align: left;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.smart-option-btn:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-soft);
+    transform: translateY(-2px);
+}
+
+.smart-option-btn .smart-option-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+/* Step circle (untuk how-to-use section di tool pages) */
 .step-circle {
     width: 60px;
     height: 60px;
@@ -40,6 +116,7 @@ body {
     margin: 0 auto;
 }
 
+/* Preset buttons */
 .preset.active {
     background-color: var(--primary);
     color: white;
@@ -60,7 +137,35 @@ body {
     border-radius: 12px;
 }
 
+.accordion-item {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
 .accordion-button:not(.collapsed) {
     background-color: var(--primary-soft);
     color: var(--primary);
+}
+
+/* Badge styling */
+.badge.bg-success-soft {
+    background-color: var(--success-soft) !important;
+    color: #198754 !important;
+}
+.badge.bg-warning-soft {
+    background-color: var(--warning-soft) !important;
+    color: #997404 !important;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+    .hero-smart h1 {
+        font-size: 1.75rem;
+    }
+    .upload-zone-large {
+        padding: 2rem 1rem;
+    }
+    .upload-zone-large i {
+        font-size: 3rem !important;
+    }
 }

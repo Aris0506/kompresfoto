@@ -1,4 +1,4 @@
-// KompresFoto.id - Frontend Logic
+// Kompres Foto Tool Logic
 (function() {
     const uploadZone = document.getElementById('uploadZone');
     const fileInput = document.getElementById('fileInput');
@@ -53,13 +53,11 @@
         compressBtn.disabled = false;
     }
 
-    // Click upload
     uploadZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length) showFile(e.target.files[0]);
     });
 
-    // Drag & drop
     uploadZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadZone.classList.add('dragover');
@@ -73,11 +71,9 @@
         if (e.dataTransfer.files.length) showFile(e.dataTransfer.files[0]);
     });
 
-    // Remove file
     removeFile.addEventListener('click', resetAll);
     resetBtn.addEventListener('click', resetAll);
 
-    // Presets
     presets.forEach(btn => {
         btn.addEventListener('click', () => {
             targetKb.value = btn.dataset.kb;
@@ -86,7 +82,6 @@
         });
     });
 
-    // Compress action
     compressBtn.addEventListener('click', async () => {
         if (!selectedFile) return;
 
@@ -118,13 +113,12 @@
                 return;
             }
 
-            // Tampilkan hasil
             document.getElementById('resultOriginal').textContent = formatSize(data.original_size_kb);
             document.getElementById('resultFinal').textContent = formatSize(data.final_size_kb);
             document.getElementById('resultReduction').textContent = data.reduction_percent + '%';
             downloadBtn.href = data.download_url;
             resultState.classList.remove('d-none');
-            adSlotResult.classList.remove('d-none'); // Show ad after success
+            adSlotResult.classList.remove('d-none');
         } catch (err) {
             showError('Network error, coba refresh ya');
         }

@@ -1,9 +1,0 @@
-__pycache__/
-*.pyc
-venv/
-uploads/*
-compressed/*
-!uploads/.gitkeep
-!compressed/.gitkeep
-.env
-*.log

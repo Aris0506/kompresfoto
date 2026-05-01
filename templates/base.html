@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="nyqBYHU9Q93y6rj-9ma1UDFhKSBUahbw-ozgGaKaUqA" />
+    
+    {% block meta %}
+    <title>{% block title %}Kompresin.my.id - Tools Foto & PDF Gratis Online{% endblock %}</title>
+    <meta name="description" content="{% block description %}Kompresin.my.id - Tools gratis kompres foto, ganti background, pas foto, kompres PDF. Cocok buat CPNS, lamaran kerja, daftar sekolah.{% endblock %}">
+    {% endblock %}
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-062LSQRGDF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-062LSQRGDF');
+    </script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-magic text-primary"></i> Kompresin<span class="text-muted">.my.id</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/kompres-foto">Kompres Foto</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pas-foto">Pas Foto</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ganti-background">Ganti BG</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/kompres-pdf">Kompres PDF</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <!-- Adsterra Native Banner (sebelum footer) -->
+    {% if show_native_ad|default(true) %}
+    <section class="py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <small class="text-muted text-center d-block mb-2">Iklan</small>
+                    <script async="async" data-cfasync="false" src="//pl29301197.profitablecpmratenetwork.com/62c9df870437eccf9ac954b7f77fdbfc/invoke.js"></script>
+                    <div id="container-62c9df870437eccf9ac954b7f77fdbfc"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="py-4 border-top bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <small class="text-muted">© 2026 Kompresin.my.id — Gampangin file kamu, gratis selamanya</small>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <small>
+                        <a href="/" class="text-muted text-decoration-none mx-2">Home</a>
+                        <a href="/kompres-foto" class="text-muted text-decoration-none mx-2">Kompres Foto</a>
+                        <a href="/cpns" class="text-muted text-decoration-none mx-2">CPNS</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

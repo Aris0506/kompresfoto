@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Kompres Foto Online Sesuai Target KB | Kompresin.my.id{% endblock %}
+{% block description %}Kompres foto JPG/PNG sesuai target ukuran KB (200KB, 500KB, 1MB). Cocok buat upload CPNS, lamaran kerja, daftar sekolah. Gratis & tanpa watermark.{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-4">
+                    <h1 class="fw-bold mb-2">Kompres Foto <span class="text-primary">Sesuai Target KB</span></h1>
+                    <p class="lead text-muted">Pas buat upload CPNS (200KB), lamaran kerja (500KB-1MB), dan form lainnya.</p>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <!-- Upload area -->
+                        <div id="uploadZone" class="upload-zone text-center p-5 mb-4">
+                            <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                            <h4 class="mb-2">Drop foto di sini atau klik untuk pilih</h4>
+                            <p class="text-muted mb-0">JPG, PNG, WebP — Max 20MB</p>
+                            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/bmp" hidden>
+                        </div>
+
+                        <div id="filePreview" class="d-none mb-4">
+                            <div class="alert alert-light border d-flex align-items-center">
+                                <i class="bi bi-file-image text-primary fs-3 me-3"></i>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold" id="fileName">-</div>
+                                    <small class="text-muted" id="fileSize">-</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" id="removeFile">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Target Ukuran File</label>
+                            <div class="input-group input-group-lg">
+                                <input type="number" class="form-control" id="targetKb" value="200" min="10" max="5000">
+                                <span class="input-group-text">KB</span>
+                            </div>
+                            <div class="mt-2 d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="100">100 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="200">200 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="300">300 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="500">500 KB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="1000">1 MB</button>
+                                <button class="btn btn-sm btn-outline-secondary preset" data-kb="2000">2 MB</button>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> CPNS biasanya 200KB, lamaran kerja 500KB-1MB
+                            </small>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100" id="compressBtn" disabled>
+                            <i class="bi bi-magic"></i> Kompres Sekarang
+                        </button>
+
+                        <div id="loadingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-3 mb-0">Lagi proses... bentar ya</p>
+                        </div>
+
+                        <div id="resultState" class="d-none mt-4">
+                            <div class="alert alert-success border-0">
+                                <h5 class="alert-heading"><i class="bi bi-check-circle-fill"></i> Sukses!</h5>
+                                <div class="row text-center mt-3">
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Sebelum</small>
+                                        <strong id="resultOriginal">-</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Sesudah</small>
+                                        <strong id="resultFinal" class="text-success">-</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Hemat</small>
+                                        <strong id="resultReduction" class="text-primary">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
+                                <i class="bi bi-download"></i> Download Hasil
+                            </a>
+                            <button class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
+                                <i class="bi bi-arrow-clockwise"></i> Kompres Foto Lain
+                            </button>
+                        </div>
+
+                        <div id="errorState" class="alert alert-danger d-none mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
+                <div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
+                    <small class="text-muted d-block mb-2">Iklan</small>
+                    <div style="display: flex; justify-content: center;">
+                        <script type="text/javascript">
+                            atOptions = {
+                                'key' : 'd4c1966bed2135f18595a1ed7645db4b',
+                                'format' : 'iframe',
+                                'height' : 250,
+                                'width' : 300,
+                                'params' : {}
+                            };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
+                    </div>
+                </div>
+
+                <!-- Tips section (good for SEO) -->
+                <div class="mt-5">
+                    <h3 class="fw-bold mb-3">Tips Kompres Foto</h3>
+                    <ul class="text-muted">
+                        <li>Untuk <strong>SSCASN/CPNS</strong>, target 200KB sudah memenuhi requirement standar</li>
+                        <li>Untuk <strong>JobStreet</strong>, batasan 1MB — jadi 800KB aman</li>
+                        <li>Untuk <strong>email lamaran kerja ke HRD</strong>, lebih baik di bawah 500KB biar gak fullin inbox</li>
+                        <li>Hasil kami selalu di bawah atau sama dengan target lo, gak akan over</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/kompres-foto.js') }}"></script>
+{% endblock %}
