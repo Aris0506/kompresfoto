@@ -105,7 +105,8 @@
                         <!-- Loading -->
                         <div id="loadingState" class="d-none text-center py-4">
                             <div class="spinner-border text-primary" role="status"></div>
-                            <p class="mt-3 mb-0">Lagi proses... PDF biasanya butuh ~5-15 detik</p>
+                            <p class="mt-3 mb-1 fw-semibold" id="loadingMainMsg">Lagi proses pake AI Engine...</p>
+                            <small class="text-muted d-block" id="loadingSubMsg">Bentar ya, lagi nyiapin file lo ✨</small>
                         </div>
 
                         <!-- Result -->
@@ -195,6 +196,49 @@
     const adSlotResult = document.getElementById('adSlotResult');
     const qualityBtns = document.querySelectorAll('.quality-btn');
 
+
+    // Loading message rotator (biar user gak bored)
+    let loadingRotatorInterval = null;
+
+    const loadingMessages = [
+        { main: "Lagi proses pake AI Engine...", sub: "Bentar ya, lagi nyiapin file lo" },
+        { main: "Lagi optimasi gambar dalam PDF...", sub: "Ini bagian yg paling makan waktu" },
+        { main: "Lagi compress streams PDF...", sub: "Setiap byte dikecilin satu-satu" },
+        { main: "Lagi finalisasi hasil...", sub: "Hampir selesai, hold on!" },
+        { main: "Lagi quality check...", sub: "Mastiin hasilnya tetep bisa dibaca ✓" },
+        { main: "Hampir selesai...", sub: "Detik-detik terakhir, sabar ya" },
+    ];
+
+    function startLoadingRotator() {
+        let idx = 0;
+        const mainEl = document.getElementById('loadingMainMsg');
+        const subEl = document.getElementById('loadingSubMsg');
+        
+        // Show pertama langsung
+        mainEl.textContent = loadingMessages[0].main;
+        subEl.textContent = loadingMessages[0].sub;
+        
+        loadingRotatorInterval = setInterval(() => {
+            idx = (idx + 1) % loadingMessages.length;
+            // Smooth transition pake fade
+            mainEl.style.opacity = '0';
+            subEl.style.opacity = '0';
+            setTimeout(() => {
+                mainEl.textContent = loadingMessages[idx].main;
+                subEl.textContent = loadingMessages[idx].sub;
+                mainEl.style.opacity = '1';
+                subEl.style.opacity = '1';
+            }, 200);
+        }, 3000); // ganti tiap 3 detik
+    }
+
+    function stopLoadingRotator() {
+        if (loadingRotatorInterval) {
+            clearInterval(loadingRotatorInterval);
+            loadingRotatorInterval = null;
+        }
+    }
+
     let selectedFile = null;
     let selectedQuality = 'medium';
 
@@ -229,6 +273,7 @@
         errorState.textContent = msg;
         errorState.classList.remove('d-none');
         loadingState.classList.add('d-none');
+        stopLoadingRotator();  // ← TAMBAHIN
         compressBtn.classList.remove('d-none');
         compressBtn.disabled = false;
     }
@@ -266,6 +311,7 @@
         compressBtn.classList.add('d-none');
         loadingState.classList.remove('d-none');
         errorState.classList.add('d-none');
+        startLoadingRotator();  // ← TAMBAHIN INI
 
         const formData = new FormData();
         formData.append('file', selectedFile);
@@ -305,6 +351,10 @@
 }
 .quality-btn {
     transition: all 0.15s ease;
+}
+
+#loadingMainMsg, #loadingSubMsg {
+    transition: opacity 0.2s ease;
 }
 </style>
 {% endblock %}
