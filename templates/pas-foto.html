@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Pas Foto Maker Online - Ukuran 2x3, 3x4, 4x6 | Kompresin.my.id{% endblock %}
-{% block description %}Bikin pas foto online ukuran 2x3, 3x4, 4x6 cm. Background merah, biru, atau putih. Cocok buat CPNS, ijazah, KTP, lamaran kerja. Gratis & langsung print-ready.{% endblock %}
+{% block title %}Pas Foto Maker AI - 2x3, 3x4, 4x6 | Coming Soon | Kompresin.my.id{% endblock %}
+{% block description %}Pas foto AI segera hadir di Kompresin.my.id. Auto remove background, ukuran 2x3/3x4/4x6, background merah/biru/putih. Cocok buat CPNS, ijazah, lamaran kerja.{% endblock %}
 
 {% block content %}
 <section class="hero py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-7 text-center text-lg-start">
-                <h1 class="display-5 fw-bold mb-3">Pas Foto Maker <span class="text-primary">Print-Ready</span></h1>
-                <p class="lead text-muted">Bikin pas foto ukuran <strong>2x3, 3x4, 4x6 cm</strong> dengan background merah/biru/putih. Cocok buat CPNS, ijazah, lamaran kerja. <strong>Gratis & langsung print-ready (DPI 300).</strong></p>
+                <div class="badge bg-warning text-dark fs-6 mb-3 px-3 py-2">
+                    🚧 Launching dalam 3 hari!
+                </div>
+                <h1 class="display-5 fw-bold mb-3">Pas Foto Maker <span class="text-primary">dengan AI</span></h1>
+                <p class="lead text-muted">Lagi upgrade ke <strong>AI premium quality</strong> biar hasil pas foto lo dewa. Background otomatis ke-remove, hasil rapi tanpa edit manual. <strong>Free unlimited.</strong></p>
                 <div class="d-flex gap-2 justify-content-center justify-content-lg-start flex-wrap mt-3">
-                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Ukuran standard Indonesia</span>
-                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> 3 warna background</span>
-                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> DPI 300 print-ready</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-stars text-warning"></i> AI Auto Remove</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-infinity text-primary"></i> Unlimited free</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Print-ready DPI 300</span>
                 </div>
             </div>
             <div class="col-lg-5 d-none d-lg-block text-center">
@@ -24,7 +27,7 @@
 </section>
 
 <!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
-<div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
+<div class="ad-slot text-center my-4 p-3 bg-light rounded" id="adSlotResult">
     <small class="text-muted d-block mb-2">Iklan</small>
     <div style="display: flex; justify-content: center;">
         <script type="text/javascript">
@@ -45,317 +48,62 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
-                    <div class="card-body p-4 p-md-5">
-
-                        <!-- Tip box -->
-                        <div class="alert alert-info border-0 mb-4">
-                            <i class="bi bi-info-circle-fill"></i> <strong>Tips:</strong> Smart AI kami auto-deteksi wajah & badan lo, terus ganti background-nya dengan warna pilihan. Foto outdoor / background ramai juga bisa!
-                        </div>
-
-                        <!-- Upload area -->
-                        <div id="uploadZone" class="upload-zone text-center p-5 mb-4">
-                            <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
-                            <h4 class="mb-2">Drop foto di sini atau klik untuk pilih</h4>
-                            <p class="text-muted mb-0">JPG, PNG, WebP — Max 5MB</p>
-                            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/bmp" hidden>
-                        </div>
-
-                        <!-- Preview file -->
-                        <div id="filePreview" class="d-none mb-4">
-                            <div class="alert alert-light border d-flex align-items-center">
-                                <i class="bi bi-file-image text-primary fs-3 me-3"></i>
-                                <div class="flex-grow-1">
-                                    <div class="fw-semibold" id="fileName">-</div>
-                                    <small class="text-muted" id="fileSize">-</small>
-                                </div>
-                                <button class="btn btn-sm btn-outline-danger" id="removeFile">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Pilih ukuran -->
+                    <div class="card-body p-4 p-md-5 text-center">
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Ukuran Pas Foto</label>
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <button type="button" class="btn btn-outline-primary w-100 size-btn active" data-size="3x4">
-                                        <strong>3x4 cm</strong><br><small>Paling umum</small>
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button type="button" class="btn btn-outline-primary w-100 size-btn" data-size="2x3">
-                                        <strong>2x3 cm</strong><br><small>Kecil</small>
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button type="button" class="btn btn-outline-primary w-100 size-btn" data-size="4x6">
-                                        <strong>4x6 cm</strong><br><small>Besar</small>
-                                    </button>
-                                </div>
-                            </div>
+                            <i class="bi bi-tools text-primary" style="font-size: 4rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Lagi Upgrade ke AI Premium</h3>
+                        <p class="text-muted mb-4">
+                            Algoritma manual hasilnya kurang memuaskan, jadi kami sedang upgrade ke AI quality untuk hasil yang dewa. <strong>3 hari lagi siap!</strong>
+                        </p>
+
+                        <div class="alert alert-info border-0 text-start">
+                            <h6 class="fw-bold"><i class="bi bi-info-circle-fill"></i> Apa yang akan ada?</h6>
+                            <ul class="mb-0">
+                                <li><strong>AI Auto Remove Background</strong> — bisa untuk foto apapun, gak perlu bg polos</li>
+                                <li><strong>Ukuran standar Indonesia</strong>: 2x3, 3x4, 4x6 cm (DPI 300, print-ready)</li>
+                                <li><strong>3 warna background</strong>: merah, biru, putih</li>
+                                <li><strong>Free unlimited</strong> — gak ada batas pemakaian</li>
+                            </ul>
                         </div>
 
-                        <!-- Pilih warna -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Warna Background</label>
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <button type="button" class="btn w-100 color-btn active" data-color="merah" style="background-color: #dc3545; color: white; border: 2px solid #dc3545;">
-                                        Merah
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button type="button" class="btn w-100 color-btn" data-color="biru" style="background-color: #0d6efd; color: white; border: 2px solid #0d6efd;">
-                                        Biru
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button type="button" class="btn w-100 color-btn" data-color="putih" style="background-color: #ffffff; color: #212529; border: 2px solid #ced4da;">
-                                        Putih
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mode Background: Manual vs AI -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Mode Background</label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-primary w-100 mode-btn active" data-mode="manual">
-                                        <i class="bi bi-droplet-fill"></i> <strong>Manual</strong><br>
-                                        <small>Foto bg polos → ganti warna</small>
-                                    </button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-secondary w-100 mode-btn" data-mode="ai" disabled>
-                                        <i class="bi bi-stars"></i> <strong>AI Auto Remove</strong><br>
-                                        <small><span class="badge bg-warning text-dark">Coming Soon</span></small>
-                                    </button>
-                                </div>
-                            </div>
-                            <small class="text-muted d-block mt-2">
-                                <i class="bi bi-info-circle"></i> <strong>Manual</strong>: cocok buat foto background polos. <strong>AI</strong>: bisa untuk foto apapun (segera hadir).
-                            </small>
-                        </div>
-
-                        <!-- Mode Background: Smart AI vs Premium AI -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Mode Background</label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-primary w-100 mode-btn active" data-mode="smart">
-                                        <i class="bi bi-magic"></i> <strong>Smart AI</strong><br>
-                                        <small>Auto remove background</small>
-                                    </button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-secondary w-100 mode-btn" data-mode="premium" disabled>
-                                        <i class="bi bi-stars"></i> <strong>Premium AI</strong><br>
-                                        <small><span class="badge bg-warning text-dark">Coming Soon</span></small>
-                                    </button>
-                                </div>
-                            </div>
-                            <small class="text-muted d-block mt-2">
-                                <i class="bi bi-info-circle"></i> <strong>Smart AI</strong>: bisa untuk foto apapun, hasil rapi. <strong>Premium AI</strong>: kualitas studio profesional (segera hadir).
-                            </small>
-                        </div>
-                        <!-- Action button -->
-                        <button class="btn btn-primary btn-lg w-100" id="processBtn" disabled>
-                            <i class="bi bi-magic"></i> Bikin Pas Foto
-                        </button>
-
-                        <!-- Loading -->
-                        <div id="loadingState" class="d-none text-center py-4">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p class="mt-3 mb-0">Lagi proses... bentar ya</p>
-                        </div>
-
-                        <!-- Result -->
-                        <div id="resultState" class="d-none mt-4">
-                            <div class="alert alert-success border-0">
-                                <h5 class="alert-heading"><i class="bi bi-check-circle-fill"></i> Pas foto siap!</h5>
-                                <div class="row text-center mt-3">
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Ukuran</small>
-                                        <strong id="resultSize">-</strong>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Background</small>
-                                        <strong id="resultColor">-</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
-                                <i class="bi bi-download"></i> Download Pas Foto
+                        <div class="mt-4">
+                            <a href="/" class="btn btn-primary btn-lg">
+                                <i class="bi bi-magic"></i> Sementara, Coba Kompres Foto
                             </a>
-                            <button class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
-                                <i class="bi bi-arrow-clockwise"></i> Bikin Pas Foto Lain
-                            </button>
                         </div>
-
-                        <!-- Error -->
-                        <div id="errorState" class="alert alert-danger d-none mt-3"></div>
                     </div>
                 </div>
 
-
                 <!-- Tips section (good for SEO) -->
                 <div class="mt-5">
-                    <h3 class="fw-bold mb-3">Tips Bikin Pas Foto Bagus</h3>
+                    <h3 class="fw-bold mb-3">Tentang Pas Foto di Indonesia</h3>
+                    <p class="text-muted">Pas foto adalah salah satu dokumen yang paling sering dibutuhkan untuk berbagai keperluan administrasi di Indonesia. Berikut beberapa hal yang perlu diketahui:</p>
+                    
+                    <h5 class="fw-bold mt-4">Ukuran Standard Pas Foto</h5>
                     <ul class="text-muted">
-                        <li><strong>Background polos</strong>: Foto dengan background warna 1 (kayak tembok putih) hasil paling rapi</li>
-                        <li><strong>Pencahayaan rata</strong>: Hindari shadow di muka — pakai lampu atau cahaya dari depan</li>
-                        <li><strong>Pakai baju kontras</strong>: Hindari baju warnanya sama dengan background lama</li>
-                        <li><strong>Ekspresi netral</strong>: Senyum tipis aja, jangan terlalu lebar (untuk dokumen formal)</li>
-                        <li><strong>Untuk SSCASN/CPNS</strong>: Lahir tahun ganjil → background <strong>merah</strong>. Lahir tahun genap → background <strong>biru</strong></li>
+                        <li><strong>2x3 cm</strong>: Untuk dokumen kecil, kartu pelajar, kartu identitas internal</li>
+                        <li><strong>3x4 cm</strong>: Paling umum, dipakai untuk SKCK, ijazah, lamaran kerja, KTP, SIM</li>
+                        <li><strong>4x6 cm</strong>: Untuk dokumen formal yang butuh foto lebih besar, beberapa formulir bank, paspor</li>
+                    </ul>
+
+                    <h5 class="fw-bold mt-4">Warna Background untuk SSCASN/CPNS</h5>
+                    <ul class="text-muted">
+                        <li><strong>Background Merah</strong>: Untuk pelamar yang lahir di tahun ganjil</li>
+                        <li><strong>Background Biru</strong>: Untuk pelamar yang lahir di tahun genap</li>
+                        <li><strong>Background Putih</strong>: Untuk dokumen umum (ijazah, KTP, SIM)</li>
+                    </ul>
+
+                    <h5 class="fw-bold mt-4">Tips Persiapan Foto</h5>
+                    <ul class="text-muted">
+                        <li>Pakai baju formal warna kontras (bukan warna sama dengan background pilihan)</li>
+                        <li>Pencahayaan rata, hindari shadow di muka</li>
+                        <li>Ekspresi netral, mata terbuka, tidak pakai kacamata gelap</li>
+                        <li>Rambut rapi, tidak menutupi wajah</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-(function() {
-    const uploadZone = document.getElementById('uploadZone');
-    const fileInput = document.getElementById('fileInput');
-    const filePreview = document.getElementById('filePreview');
-    const fileName = document.getElementById('fileName');
-    const fileSize = document.getElementById('fileSize');
-    const removeFile = document.getElementById('removeFile');
-    const processBtn = document.getElementById('processBtn');
-    const loadingState = document.getElementById('loadingState');
-    const resultState = document.getElementById('resultState');
-    const errorState = document.getElementById('errorState');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const adSlotResult = document.getElementById('adSlotResult');
-    const sizeBtns = document.querySelectorAll('.size-btn');
-    const colorBtns = document.querySelectorAll('.color-btn');
-
-    let selectedFile = null;
-    let selectedSize = '3x4';
-    let selectedColor = 'merah';
-
-    function formatSize(kb) {
-        if (kb < 1024) return kb.toFixed(1) + ' KB';
-        return (kb / 1024).toFixed(2) + ' MB';
-    }
-
-    function showFile(file) {
-        selectedFile = file;
-        fileName.textContent = file.name;
-        fileSize.textContent = formatSize(file.size / 1024);
-        filePreview.classList.remove('d-none');
-        uploadZone.classList.add('d-none');
-        processBtn.disabled = false;
-        errorState.classList.add('d-none');
-    }
-
-    function resetAll() {
-        selectedFile = null;
-        fileInput.value = '';
-        filePreview.classList.add('d-none');
-        uploadZone.classList.remove('d-none');
-        resultState.classList.add('d-none');
-        errorState.classList.add('d-none');
-        adSlotResult.classList.add('d-none');
-        processBtn.disabled = true;
-        processBtn.classList.remove('d-none');
-    }
-
-    function showError(msg) {
-        errorState.textContent = msg;
-        errorState.classList.remove('d-none');
-        loadingState.classList.add('d-none');
-        processBtn.classList.remove('d-none');
-        processBtn.disabled = false;
-    }
-
-    uploadZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) showFile(e.target.files[0]);
-    });
-
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-    });
-    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-    uploadZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) showFile(e.dataTransfer.files[0]);
-    });
-
-    removeFile.addEventListener('click', resetAll);
-    resetBtn.addEventListener('click', resetAll);
-
-    sizeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            sizeBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedSize = btn.dataset.size;
-        });
-    });
-
-    colorBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            colorBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedColor = btn.dataset.color;
-        });
-    });
-
-    processBtn.addEventListener('click', async () => {
-        if (!selectedFile) return;
-
-        processBtn.classList.add('d-none');
-        loadingState.classList.remove('d-none');
-        errorState.classList.add('d-none');
-
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('size', selectedSize);
-        formData.append('color', selectedColor);
-
-        try {
-            const res = await fetch('/api/passport-photo', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-
-            loadingState.classList.add('d-none');
-
-            if (!res.ok || !data.success) {
-                showError(data.error || 'Gagal bikin pas foto, coba lagi');
-                return;
-            }
-
-            document.getElementById('resultSize').textContent = data.size + ' (' + data.pixels + ' px)';
-            document.getElementById('resultColor').textContent = data.color.charAt(0).toUpperCase() + data.color.slice(1);
-            downloadBtn.href = data.download_url;
-            resultState.classList.remove('d-none');
-            adSlotResult.classList.remove('d-none');
-        } catch (err) {
-            showError('Network error, coba refresh ya');
-        }
-    });
-})();
-</script>
-
-<style>
-.size-btn.active, .color-btn.active {
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.5);
-    transform: scale(1.02);
-}
-.size-btn, .color-btn {
-    transition: all 0.15s ease;
-}
-</style>
 {% endblock %}
