@@ -511,7 +511,7 @@ def sitemap():
         {'loc': 'https://kompresin.my.id/kompres-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/merge-pdf', 'priority': '0.9', 'changefreq': 'weekly'},
         {'loc': 'https://kompresin.my.id/blog', 'priority': '0.8', 'changefreq': 'weekly'},
-        {'loc': 'https://kompresin.my.id/blog/kompres-foto-cpns-2026', 'priority': '0.9', 'changefreq': 'monthly'},
+        {'loc': 'https://kompresin.my.id/blog/kompres-foto-cpns', 'priority': '0.9', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/cpns', 'priority': '0.8', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/lamaran-kerja', 'priority': '0.8', 'changefreq': 'monthly'},
     ]
