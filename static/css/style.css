@@ -130,11 +130,17 @@ body {
     border-color: var(--primary);
 }
 
-
 .ad-slot {
-    border: 1px dashed #cbd5e1;
-    min-height: 100px;
-    margin: 20px 0; /* Tambahin jarak biar jempol user nggak salah klik */
+    border: 1px dashed #cbd5e1;     /* Visual border */
+    display: flex;                  /* Perataan konten iklan */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;               /* Agar iklan nggak meluber keluar kotak */
+    position: relative;             /* Syarat agar z-index jalan[cite: 1] */
+    z-index: 1;                     /* Tetap di lapisan bawah[cite: 1] */
+    margin: 2rem 0;                 /* Jarak aman atas-bawah[cite: 1] */
+    pointer-events: auto;           /* Iklan tetap bisa diklik[cite: 1] */
 }
 
 .card {
@@ -195,12 +201,10 @@ body {
     z-index: 1000 !important; /* Angka tinggi agar tidak tertutup layer iklan transparan */
 }
 
-/* Isolasi area iklan agar tidak "meluber" ke elemen lain */
-.ad-slot, 
-[id^="container-"] { 
+
+
+/* Pastiin tombol lo tetep di atas kalau ada iklan melayang */
+.btn-primary, .upload-zone {
     position: relative;
-    z-index: 1; /* Tetap di lapisan bawah */
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    pointer-events: auto; /* Iklan tetap bisa diklik kalau user emang niat */
+    z-index: 10;
 }
