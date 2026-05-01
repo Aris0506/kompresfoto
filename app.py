@@ -144,7 +144,7 @@ import os as _os_blog  # alias biar gak conflict
 
 # Mapping slug ke metadata artikel (gampang nambah artikel baru)
 BLOG_ARTICLES = {
-    'kompres-foto-cpns-2026': {
+    'kompres-foto-cpns': {
         'title': 'Cara Kompres Foto SSCASN CPNS 2026 - Maksimal 200KB Tanpa Aplikasi',
         'description': 'Panduan lengkap kompres foto pasfoto, swafoto, dan dokumen untuk SSCASN CPNS 2026. Sesuai requirement 200KB tanpa aplikasi, gratis & tanpa watermark.',
         'date': '2026-05-01',
