@@ -278,7 +278,10 @@ def api_compress_pdf():
             os.remove(upload_path)
         except OSError:
             pass
-        return jsonify({'error': f'Gagal kompres PDF: {str(e)}'}), 500
+        error_msg = str(e)
+        if 'timeout' in error_msg.lower() or 'terlalu lama' in error_msg.lower():
+            error_msg = 'PDF lo terlalu kompleks/besar. Coba pilih kualitas "Low" atau split PDF jadi bagian lebih kecil dulu.'
+        return jsonify({'error': error_msg}), 500
 
     try:
         os.remove(upload_path)
