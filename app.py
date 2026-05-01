@@ -18,7 +18,7 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB max upload
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 20MB max upload
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['COMPRESSED_FOLDER'] = 'compressed'
 
