@@ -165,6 +165,13 @@ BLOG_ARTICLES = {
         'category': 'Dokumen',
         'reading_time': '7 menit',
     },
+    'bahaya-data-pribadi-bocor-uu-pdp': {
+        'title': 'Bahaya Upload KTP Sembarangan: Mengenal UU PDP dan Keamanan Data',
+        'description': 'Panduan mengenai risiko keamanan saat mengunggah dokumen pribadi ke internet, penjelasan UU Perlindungan Data Pribadi, dan cara aman kompres berkas digital.',
+        'date': '2026-05-04',
+        'category': 'Keamanan',
+        'reading_time': '6 menit',
+    },
     # Nanti tambah artikel lain di sini
 }
 
@@ -540,6 +547,7 @@ def sitemap():
         {'loc': 'https://kompresin.my.id/blog/kompres-foto-cpns', 'priority': '0.9', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/blog/lolos-face-recognition-sscasn', 'priority': '0.9', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/blog/ukuran-foto-ktp-sim-paspor-bpjs', 'priority': '0.9', 'changefreq': 'monthly'},
+        {'loc': 'https://kompresin.my.id/blog/bahaya-data-pribadi-bocor-uu-pdp', 'priority': '0.9', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/cpns', 'priority': '0.8', 'changefreq': 'monthly'},
         {'loc': 'https://kompresin.my.id/lamaran-kerja', 'priority': '0.8', 'changefreq': 'monthly'},
     ]

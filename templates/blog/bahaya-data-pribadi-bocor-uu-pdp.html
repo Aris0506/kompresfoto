@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+{% block description %}{{ article.description }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/blog" class="text-decoration-none">Blog</a></li>
+                        <li class="breadcrumb-item active">Keamanan Data</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-danger me-2">{{ article.category }}</span>
+                    <small class="text-muted">{{ article.date }} · {{ article.reading_time }} baca</small>
+                </div>
+                <h1 class="display-5 fw-bold mb-3">{{ article.title }}</h1>
+                <p class="lead text-muted">{{ article.description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
+<div class="ad-slot text-center my-4 p-3 bg-light rounded" id="adSlotResult">
+    <small class="text-muted d-block mb-2">Iklan</small>
+    <div style="display: flex; justify-content: center;">
+        <script type="text/javascript">
+                atOptions = {
+                    'key' : 'd4c1966bed2135f18595a1ed7645db4b',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+        </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
+    </div>
+</div>
+
+<article class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="lead">Proses pendaftaran CPNS dan lowongan kerja sering kali menuntut pelamar untuk mengunggah dokumen pribadi seperti KTP dan Ijazah dalam ukuran maksimal 200 KB. Karena desakan waktu, banyak pelamar menggunakan situs kompresi daring tanpa mempertimbangkan aspek keamanan data.</p>
+
+                <figure class="my-4 text-center">
+                    <img src="/static/images/blog/bahaya-data-KTP-pribadi.jpg" alt="Ilustrasi bahaya kebocoran data KTP" class="img-fluid rounded shadow-sm">
+                    <figcaption class="small text-muted mt-2">
+                        Ilustrasi oleh Kompresin.my.id
+                    </figcaption>
+                </figure>
+
+                <p>Sebagai bagian dari administrasi pelayanan publik, saya sering mendapati betapa mudahnya masyarakat menyerahkan dokumen identitas kepada pihak ketiga. Padahal, mengunggah data sensitif ke server yang tidak terpercaya merupakan risiko besar bagi keamanan privasi Anda.</p>
+
+                <h2>Risiko Mengunggah Dokumen ke Situs Tidak Terpercaya</h2>
+                <p>Dokumen yang diunggah tanpa kebijakan privasi yang jelas dapat disalahgunakan oleh pihak yang tidak bertanggung jawab untuk berbagai kepentingan:</p>
+                <ul>
+                    <li>Penyalahgunaan identitas untuk verifikasi pinjaman daring ilegal.</li>
+                    <li>Penjualan data NIK dan alamat lengkap di pasar gelap digital.</li>
+                    <li>Target serangan penipuan berbasis rekayasa sosial (phishing).</li>
+                </ul>
+
+                <h2>Memahami UU Perlindungan Data Pribadi (PDP)</h2>
+                <p>Pemerintah Indonesia telah mengesahkan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP). Undang-undang ini mewajibkan setiap pihak yang memproses data pribadi untuk menjaga kerahasiaan dan bertanggung jawab penuh atas keamanan data tersebut.</p>
+                
+                <p>Pelanggaran terhadap aturan ini dapat dikenakan sanksi administratif hingga pidana. Oleh karena itu, penting bagi Anda untuk memilih layanan digital yang memiliki protokol penghapusan data secara otomatis.</p>
+
+                <div class="alert alert-primary border-0 my-4">
+                    <i class="bi bi-shield-check-fill me-2"></i>
+                    <strong>Informasi:</strong> Kompresin.my.id menggunakan sistem otomatis yang menghapus dokumen segera setelah proses unduhan selesai sesuai standar UU PDP. 🛡️
+                </div>
+
+                <h2>Cara Aman Mengelola Berkas Digital</h2>
+                <p>Untuk menjaga keamanan, pastikan layanan yang Anda gunakan memiliki kriteria berikut:</p>
+                <ul>
+                    <li>Tidak memerlukan pendaftaran akun atau pengisian data profil.</li>
+                    <li>Menggunakan koneksi terenkripsi (HTTPS).</li>
+                    <li>Memiliki sistem penghapusan berkas instan setelah digunakan.</li>
+                </ul>
+
+                <p>Kompresin.my.id dirancang sebagai alat bantu administrasi yang memprioritaskan privasi. Sistem kami tidak menyimpan berkas secara permanen di server, melainkan hanya memprosesnya secara sementara di memori untuk kebutuhan kompresi.</p>
+
+                <h2 class="mt-5 mb-3">Pertanyaan yang Sering Diajukan (FAQ)</h2>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                                Apakah file saya disimpan di server?
+                            </button>
+                        </h3>
+                        <div id="q1" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                                Tidak. Sistem kami menggunakan fungsi otomatis yang menghapus file asli dan file hasil kompresi segera setelah Anda mengunduhnya atau sesi permintaan berakhir.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                                Apakah Kompresin.my.id mematuhi UU PDP?
+                            </button>
+                        </h3>
+                        <div id="q2" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                Ya. Kami menerapkan prinsip minimalisasi data dan penghapusan otomatis sesuai dengan amanat UU No. 27 Tahun 2022 mengenai Perlindungan Data Pribadi.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-primary text-white border-0 my-5 text-center p-4">
+                    <h3 class="fw-bold mb-3">Gunakan Layanan Aman</h3>
+                    <p class="mb-4">Kompres dokumen Anda tanpa rasa khawatir. Gratis dan aman.</p>
+                    <a href="/" class="btn btn-light btn-lg rounded-pill px-4">Mulai Kompres Sekarang</a>
+                </div>
+
+                <div class="border-top pt-4 mt-5">
+                    <small class="text-muted">
+                        Baca juga artikel terkait: <a href="/blog/kompres-foto-cpns" class="text-decoration-none">Panduan Kompres Foto SSCASN 2026</a>.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ article.title }}",
+    "description": "{{ article.description }}",
+    "author": { "@type": "Organization", "name": "Kompresin.my.id" },
+    "datePublished": "{{ article.date }}",
+    "publisher": { "@type": "Organization", "name": "Kompresin.my.id" }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Apakah file saya disimpan di server?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Tidak. Sistem kami menghapus file segera setelah unduhan selesai." }
+        },
+        {
+            "@type": "Question",
+            "name": "Apakah Kompresin.my.id mematuhi UU PDP?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ya, kami menerapkan penghapusan otomatis sesuai UU No. 27 Tahun 2022." }
+        }
+    ]
+}
+</script>
+{% endblock %}
