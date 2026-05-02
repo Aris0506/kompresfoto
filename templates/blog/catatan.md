@@ -19,3 +19,12 @@ CTA:
 - Subtle, informatif
 - Link ke tools relevan
 - Cross-link ke artikel related
+
+
+
+
+
+
+BACKLOG (kapan-kapan):
+- [ ] Wrap ad slot di 3 file blog (templates/blog/*.html) dengan {% if ads_enabled %}
+- [ ] Cek artikel baru (bahaya-data-pribadi + kompres-foto-cpns yang lo bikin sambil-sambil)

@@ -28,21 +28,24 @@
 </section>
 
 <!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
-<div class="ad-slot text-center my-4 p-3 bg-light rounded" id="adSlotResult">
+{% if ads_enabled %}
+<!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
+<div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
     <small class="text-muted d-block mb-2">Iklan</small>
     <div style="display: flex; justify-content: center;">
         <script type="text/javascript">
-                atOptions = {
-                    'key' : 'd4c1966bed2135f18595a1ed7645db4b',
-                    'format' : 'iframe',
-                    'height' : 250,
-                    'width' : 300,
-                    'params' : {}
-                };
+            atOptions = {
+                'key' : 'd4c1966bed2135f18595a1ed7645db4b',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+            };
         </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
     </div>
 </div>
+{% endif %}
 
 <!-- Main tool -->
 <section class="py-4">

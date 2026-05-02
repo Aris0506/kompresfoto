@@ -21,6 +21,18 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload (buat PDF
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['COMPRESSED_FOLDER'] = 'compressed'
 
+
+# ============================================================
+# FEATURE FLAGS — Monetization Toggle
+# ============================================================
+ADS_ENABLED = False  # ← MASTER SWITCH: True/False to enable/disable all ads
+
+
+@app.context_processor
+def inject_ads_config():
+    """Auto-inject ads_enabled to all templates."""
+    return {'ads_enabled': ADS_ENABLED}
+
 ALLOWED_IMAGE_EXT = {'jpg', 'jpeg', 'png', 'webp', 'bmp'}
 ALLOWED_PDF_EXT = {'pdf'}
 
