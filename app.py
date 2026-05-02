@@ -12,7 +12,7 @@ Struktur:
 import os
 import io
 import uuid
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, after_this_request
 from PIL import Image
 from werkzeug.utils import secure_filename
 
@@ -504,12 +504,24 @@ def api_detect_file():
         return jsonify({'error': 'Format file gak didukung'}), 400
 
 
+
 @app.route('/download/<filename>')
 def download(filename):
     safe_name = secure_filename(filename)
     file_path = os.path.join(app.config['COMPRESSED_FOLDER'], safe_name)
+    
     if not os.path.exists(file_path):
         return "File gak ditemukan atau udah expired", 404
+
+    # JURUS PENGHANCUR DATA OTOMATIS (UU PDP COMPLIANT)
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            app.logger.error(f"Gagal menghapus file {file_path}: {e}")
+        return response
+
     return send_file(file_path, as_attachment=True, download_name=f"kompresin_{safe_name}")
 
 
