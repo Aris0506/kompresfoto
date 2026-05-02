@@ -6,15 +6,23 @@
     <meta name="google-site-verification" content="nyqBYHU9Q93y6rj-9ma1UDFhKSBUahbw-ozgGaKaUqA" />
     <meta name="msvalidate.01" content="A1878283CE4B4A7EC91636C5FEBFFC23" />
 
+
     <!-- Favicon -->
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="any">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <!-- Prioritas Utama buat Google Search -->
     <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='favicon-48x48.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='android-chrome-192x192.png') }}">
+    
+    <!-- Prioritas Browser Desktop (PNG tajam didahulukan) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <!-- Fallback .ico ditaruh di bawah PNG -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+    <!-- Prioritas Apple & PWA -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='android-chrome-512x512.png') }}">
 
+    
     <!-- Open Graph / Social Media Preview -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kompresin.my.id{{ request.path }}">
@@ -39,14 +47,7 @@
     <meta name="description" content="{% block description %}Kompresin.my.id - Tools gratis kompres foto, ganti background, pas foto, kompres PDF. Cocok buat CPNS, lamaran kerja, daftar sekolah.{% endblock %}">
     {% endblock %}
     
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-062LSQRGDF"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-062LSQRGDF');
-    </script>
+    
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -61,7 +62,7 @@
                  alt="Kompresin.my.id - Kompres Foto & PDF Online Gratis" 
                  class="navbar-logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-label="Buka menu navigasi">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navMain">
@@ -98,7 +99,7 @@
     <footer class="bg-light py-5 mt-5">
         <div class="container text-center">
             <img src="{{ url_for('static', filename='images/logo-horizontal-light.svg') }}" 
-                alt="Kompresin.my.id" 
+                alt="Logo Kompresin.my.id - Solusi Kompres Foto dan PDF"
                 class="footer-logo mb-3">
             <p class="text-muted small mb-2">
                 Kompres Foto & PDF Online Gratis. Sesuai Target KB.
@@ -112,5 +113,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-062LSQRGDF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-062LSQRGDF');
+    </script>
 </body>
 </html>
