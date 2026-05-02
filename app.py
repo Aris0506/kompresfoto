@@ -150,6 +150,7 @@ BLOG_ARTICLES = {
         'date': '2026-05-01',
         'category': 'CPNS',
         'reading_time': '8 menit',
+        'thumbnail': 'cpns-kompres-foto-thumbnail.png',
     },
     'lolos-face-recognition-sscasn': {
         'title': 'Cara Lolos Verifikasi Face Recognition SSCASN CPNS 2026 (Anti TMS)',
@@ -157,6 +158,7 @@ BLOG_ARTICLES = {
         'date': '2026-05-02',
         'category': 'CPNS',
         'reading_time': '10 menit',
+         'thumbnail': 'face-recognition-thumbnail.png',
     },
     'ukuran-foto-ktp-sim-paspor-bpjs': {
         'title': 'Ukuran Foto KTP, SIM, Paspor, BPJS - Panduan Lengkap 2026',
@@ -164,6 +166,7 @@ BLOG_ARTICLES = {
         'date': '2026-05-03',
         'category': 'Dokumen',
         'reading_time': '7 menit',
+        'thumbnail': 'ukuran-foto-dokumen-thumbnail.png',
     },
     'bahaya-data-pribadi-bocor-uu-pdp': {
         'title': 'Bahaya Upload KTP Sembarangan: Mengenal UU PDP dan Keamanan Data',
@@ -186,11 +189,13 @@ def blog_index():
     return render_template('blog/index.html', articles=articles)
 
 
+
 @app.route('/blog/<slug>')
 def blog_post(slug):
     """Halaman individual artikel."""
     if slug not in BLOG_ARTICLES:
-        return "Artikel tidak ditemukan", 404
+        from flask import abort
+        abort(404)  # ← INI: trigger custom 404 page
     
     article = BLOG_ARTICLES[slug]
     template_path = f'blog/{slug}.html'
@@ -571,6 +576,15 @@ def robots():
 @app.errorhandler(413)
 def too_large(e):
     return jsonify({'error': 'File kegedean (max 5MB)'}), 413
+
+
+# ============================================================
+# Error Handler
+# ============================================================
+@app.errorhandler(404)
+def page_not_found(e):
+    """Custom 404 page."""
+    return render_template('404.html'), 404
 
 
 if __name__ == '__main__':

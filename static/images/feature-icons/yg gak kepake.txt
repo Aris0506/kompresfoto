@@ -1,0 +1,5 @@
+TIDAK INTEGRATE SEKARANG (tapi udah di static/images/, ready):
+├── tools/tool-photo.svg                ← Nanti di hero /  (kompres foto)
+├── tools/tool-pdf.svg                  ← Nanti di hero /kompres-pdf
+├── tools/tool-passport.svg             ← Nanti di hero /pas-foto
+└── tools/empty-state.svg               ← Buat 404 page nanti

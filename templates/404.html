@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Halaman Tidak Ditemukan - 404 | Kompresin.my.id{% endblock %}
+{% block description %}Halaman yang lo cari gak ditemukan. Cek URL atau balik ke homepage Kompresin.my.id.{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 text-center">
+                <img src="{{ url_for('static', filename='images/tools/empty-state.svg') }}" 
+                     alt="Halaman tidak ditemukan" 
+                     class="img-fluid mb-4"
+                     style="max-width: 400px;">
+                
+                <h1 class="display-4 fw-bold mb-3">404 - Halaman Tidak Ditemukan</h1>
+                <p class="lead text-muted mb-4">
+                    Sori bro, halaman yang lo cari kayaknya nyasar. 
+                    Mungkin URL-nya salah atau halaman-nya udah pindah.
+                </p>
+                
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <a href="/" class="btn btn-primary btn-lg">
+                        <i class="bi bi-house-fill"></i> Balik ke Homepage
+                    </a>
+                    <a href="/blog" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-book"></i> Baca Blog
+                    </a>
+                </div>
+                
+                <div class="mt-5">
+                    <h5 class="fw-bold text-muted small text-uppercase mb-3">Atau coba tools ini</h5>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <a href="/" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-aspect-ratio"></i> Kompres Foto
+                        </a>
+                        <a href="/kompres-pdf" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-file-earmark-pdf"></i> Kompres PDF
+                        </a>
+                        <a href="/merge-pdf" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-files"></i> Merge PDF
+                        </a>
+                        <a href="/pas-foto" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-person-vcard"></i> Pas Foto
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

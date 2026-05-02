@@ -18,7 +18,10 @@
                 </div>
             </div>
             <div class="col-lg-5 d-none d-lg-block text-center">
-                <i class="bi bi-image-alt text-primary" style="font-size: 10rem; opacity: 0.15;"></i>
+                <img src="{{ url_for('static', filename='images/hero/hero-illustration.svg') }}" 
+                     alt="Kompres foto JPG, PDF, PNG ke ukuran lebih kecil" 
+                     class="img-fluid hero-illustration"
+                     loading="eager">
             </div>
         </div>
     </div>
@@ -155,8 +158,9 @@
                 <a href="/pas-foto" class="text-decoration-none">
                     <div class="card tool-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="tool-icon bg-warning-soft mb-3">
-                                <i class="bi bi-person-vcard text-warning"></i>
+                            <div class="tool-icon mb-3">
+                                <img src="{{ url_for('static', filename='images/icons/icon-pas-foto.svg') }}" 
+                                    alt="Pas Foto" width="48" height="48">
                             </div>
                             <h5 class="fw-semibold text-dark">Pas Foto Maker</h5>
                             <p class="text-muted small mb-0">Ukuran 2x3, 3x4, 4x6. Background merah/biru/putih.</p>
@@ -183,9 +187,10 @@
             <div class="col-md-6 col-lg-6">
                 <a href="/kompres-pdf" class="text-decoration-none">
                     <div class="card tool-card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="tool-icon bg-danger-soft mb-3">
-                                <i class="bi bi-file-earmark-pdf text-danger"></i>
+                        <div class="card-body text-center p-4">                           
+                            <div class="tool-icon mb-3">
+                                <img src="{{ url_for('static', filename='images/icons/icon-compress-pdf.svg') }}" 
+                                    alt="Kompres PDF" width="48" height="48">
                             </div>
                             <h5 class="fw-semibold text-dark">Kompres PDF</h5>
                             <p class="text-muted small mb-0">Kecilin ukuran PDF tanpa rusak kualitas.</p>
@@ -198,8 +203,9 @@
                 <a href="/merge-pdf" class="text-decoration-none">
                     <div class="card tool-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="tool-icon bg-primary-soft mb-3">
-                                <i class="bi bi-files text-primary"></i>
+                           <div class="tool-icon mb-3">
+                                <img src="{{ url_for('static', filename='images/icons/icon-merge-pdf.svg') }}" 
+                                    alt="Merge PDF" width="48" height="48">
                             </div>
                             <h5 class="fw-semibold text-dark">Merge PDF</h5>
                             <p class="text-muted small mb-0">Gabungkan beberapa PDF jadi 1 file. Atur urutan bebas.</p>

@@ -61,14 +61,21 @@ body {
     box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
 }
 
+/* Custom tool icons */
 .tool-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    display: inline-flex;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    background: rgba(13, 110, 253, 0.05);
+    border-radius: 16px;
+}
+
+.tool-icon img {
+    width: 48px;
+    height: 48px;
 }
 
 .bg-primary-soft { background-color: var(--primary-soft); }
@@ -207,4 +214,41 @@ body {
 .btn-primary, .upload-zone {
     position: relative;
     z-index: 10;
+}
+
+
+/* Logo navbar sizing */
+.navbar-logo {
+    height: 36px;
+    width: auto;
+    display: block;
+}
+
+/* Mobile: logo lebih kecil */
+@media (max-width: 576px) {
+    .navbar-logo {
+        height: 30px;
+    }
+}
+
+/* Logo footer sizing */
+.footer-logo {
+    height: 32px;
+    width: auto;
+    opacity: 0.85;
+}
+
+
+/* Hero illustration */
+.hero-illustration {
+    max-width: 500px;
+    width: 100%;
+    height: auto;
+}
+
+/* Tool page illustrations */
+.tool-illustration {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
 }
