@@ -33,8 +33,28 @@ def inject_ads_config():
     """Auto-inject ads_enabled to all templates."""
     return {'ads_enabled': ADS_ENABLED}
 
+# ###########################
 ALLOWED_IMAGE_EXT = {'jpg', 'jpeg', 'png', 'webp', 'bmp'}
 ALLOWED_PDF_EXT = {'pdf'}
+
+# Format output yang didukung untuk kompresi foto
+SUPPORTED_OUTPUT_FORMATS = {'auto', 'jpg', 'png', 'webp'}
+
+# Mapping ke PIL format string
+PIL_FORMAT_MAP = {
+    'jpg': 'JPEG',
+    'jpeg': 'JPEG',
+    'png': 'PNG',
+    'webp': 'WEBP',
+    'bmp': 'BMP',
+}
+
+# Mapping ke ekstensi file output
+EXT_MAP = {
+    'JPEG': 'jpg',
+    'PNG': 'png',
+    'WEBP': 'webp',
+}
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['COMPRESSED_FOLDER'], exist_ok=True)
@@ -49,29 +69,48 @@ def allowed_pdf(filename):
 
 
 # ============================================================
-# CORE FUNCTION: Compress image to target size
+# CORE FUNCTIONS: Compress image to target size (multi-format)
 # ============================================================
-def compress_to_target_size(image_path, target_kb, output_path, output_format='JPEG'):
-    """Binary search quality + auto resize untuk hit target size."""
-    target_bytes = target_kb * 1024
-    img = Image.open(image_path)
 
-    if output_format == 'JPEG' and img.mode in ('RGBA', 'P', 'LA'):
-        background = Image.new('RGB', img.size, (255, 255, 255))
-        if img.mode == 'P':
+def _prepare_image_for_format(img, output_format):
+    """
+    Convert image mode sesuai target format.
+    - JPEG: butuh RGB (gak support alpha), transparansi → white background
+    - PNG/WebP: support RGBA, kita preserve alpha channel
+    """
+    if output_format == 'JPEG':
+        if img.mode in ('RGBA', 'LA'):
+            # Paste ke white background, hilangkan alpha
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            background.paste(img, mask=img.split()[-1])
+            return background
+        elif img.mode == 'P':
+            # Palette image (kayak GIF): convert via RGBA dulu
             img = img.convert('RGBA')
-        background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
-        img = background
-    elif output_format == 'JPEG' and img.mode != 'RGB':
-        img = img.convert('RGB')
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            background.paste(img, mask=img.split()[-1])
+            return background
+        elif img.mode != 'RGB':
+            return img.convert('RGB')
+        return img
+    else:
+        # PNG dan WebP support RGBA, biar transparency tetep ada
+        if img.mode not in ('RGB', 'RGBA'):
+            return img.convert('RGBA')
+        return img
 
+
+def _compress_jpeg(img, target_bytes, output_path):
+    """
+    JPEG compression: binary search quality + adaptive resize.
+    Quality range: 10-95 (di bawah 10 noise terlalu parah).
+    """
     original_width, original_height = img.size
 
     for resize_factor in [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
         if resize_factor < 1.0:
-            new_width = int(original_width * resize_factor)
-            new_height = int(original_height * resize_factor)
-            test_img = img.resize((new_width, new_height), Image.LANCZOS)
+            new_size = (int(original_width * resize_factor), int(original_height * resize_factor))
+            test_img = img.resize(new_size, Image.LANCZOS)
         else:
             test_img = img
 
@@ -82,7 +121,7 @@ def compress_to_target_size(image_path, target_kb, output_path, output_format='J
         while low <= high:
             mid = (low + high) // 2
             buffer = io.BytesIO()
-            test_img.save(buffer, format=output_format, quality=mid, optimize=True)
+            test_img.save(buffer, format='JPEG', quality=mid, optimize=True, progressive=True)
             size = buffer.tell()
 
             if size <= target_bytes:
@@ -95,13 +134,127 @@ def compress_to_target_size(image_path, target_kb, output_path, output_format='J
         if best_buffer is not None:
             with open(output_path, 'wb') as f:
                 f.write(best_buffer.getvalue())
-            final_size = os.path.getsize(output_path) / 1024
-            return True, round(final_size, 2), best_quality
+            return True, best_quality
 
-    test_img = img.resize((int(original_width * 0.25), int(original_height * 0.25)), Image.LANCZOS)
-    test_img.save(output_path, format=output_format, quality=10, optimize=True)
-    final_size = os.path.getsize(output_path) / 1024
-    return final_size <= target_kb * 1.1, round(final_size, 2), 10
+    # Fallback: aggressive resize + minimum quality
+    fallback_img = img.resize((int(original_width * 0.25), int(original_height * 0.25)), Image.LANCZOS)
+    fallback_img.save(output_path, format='JPEG', quality=10, optimize=True)
+    return False, 10
+
+
+def _compress_png(img, target_bytes, output_path):
+    """
+    PNG compression: PNG itu lossless, jadi strategi utama = RESIZE.
+    Kita gak punya 'quality' parameter, cuma compress_level (0-9, ngaruh sedikit).
+    
+    Strategy:
+    1. Coba dengan max compression dulu (compress_level=9)
+    2. Kalo masih kegedean, resize bertahap
+    3. Last resort: aggressive resize + quantize ke palette mode (256 colors)
+    """
+    original_width, original_height = img.size
+
+    for resize_factor in [1.0, 0.85, 0.7, 0.55, 0.4, 0.3]:
+        if resize_factor < 1.0:
+            new_size = (int(original_width * resize_factor), int(original_height * resize_factor))
+            test_img = img.resize(new_size, Image.LANCZOS)
+        else:
+            test_img = img
+
+        # Try max compression
+        buffer = io.BytesIO()
+        test_img.save(buffer, format='PNG', optimize=True, compress_level=9)
+        size = buffer.tell()
+
+        if size <= target_bytes:
+            with open(output_path, 'wb') as f:
+                f.write(buffer.getvalue())
+            return True, None  # PNG gak punya 'quality', return None
+
+    # Last resort: quantize ke 256 colors (palette mode) + small resize
+    fallback_img = img.resize((int(original_width * 0.4), int(original_height * 0.4)), Image.LANCZOS)
+    if fallback_img.mode == 'RGBA':
+        fallback_img = fallback_img.quantize(colors=256, method=Image.Quantize.FASTOCTREE)
+    else:
+        fallback_img = fallback_img.convert('P', palette=Image.ADAPTIVE, colors=256)
+    fallback_img.save(output_path, format='PNG', optimize=True, compress_level=9)
+    return False, None
+
+
+def _compress_webp(img, target_bytes, output_path):
+    """
+    WebP compression: mirip JPEG, ada quality parameter (1-100).
+    WebP biasanya lebih efisien 25-35% dibanding JPEG di kualitas yang sama.
+    """
+    original_width, original_height = img.size
+
+    for resize_factor in [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
+        if resize_factor < 1.0:
+            new_size = (int(original_width * resize_factor), int(original_height * resize_factor))
+            test_img = img.resize(new_size, Image.LANCZOS)
+        else:
+            test_img = img
+
+        low, high = 10, 95
+        best_buffer = None
+        best_quality = None
+
+        while low <= high:
+            mid = (low + high) // 2
+            buffer = io.BytesIO()
+            test_img.save(buffer, format='WEBP', quality=mid, method=6)
+            size = buffer.tell()
+
+            if size <= target_bytes:
+                best_quality = mid
+                best_buffer = buffer
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        if best_buffer is not None:
+            with open(output_path, 'wb') as f:
+                f.write(best_buffer.getvalue())
+            return True, best_quality
+
+    # Fallback: aggressive resize + min quality
+    fallback_img = img.resize((int(original_width * 0.25), int(original_height * 0.25)), Image.LANCZOS)
+    fallback_img.save(output_path, format='WEBP', quality=10, method=6)
+    return False, 10
+
+
+def compress_to_target_size(image_path, target_kb, output_path, output_format='JPEG'):
+    """
+    Dispatcher: route ke compressor sesuai format output.
+    
+    Args:
+        image_path: path ke file input
+        target_kb: target size dalam KB
+        output_path: path output
+        output_format: 'JPEG', 'PNG', atau 'WEBP'
+    
+    Returns:
+        (success: bool, final_size_kb: float, quality: int|None)
+    """
+    target_bytes = target_kb * 1024
+    img = Image.open(image_path)
+    img = _prepare_image_for_format(img, output_format)
+
+    # Route ke compressor yang sesuai
+    if output_format == 'JPEG':
+        success, quality = _compress_jpeg(img, target_bytes, output_path)
+    elif output_format == 'PNG':
+        success, quality = _compress_png(img, target_bytes, output_path)
+    elif output_format == 'WEBP':
+        success, quality = _compress_webp(img, target_bytes, output_path)
+    else:
+        raise ValueError(f"Unsupported output format: {output_format}")
+
+    final_size_kb = round(os.path.getsize(output_path) / 1024, 2)
+
+    # Considered "on target" kalo dalam 10% toleransi (PNG khususnya susah hit exact)
+    on_target = final_size_kb <= target_kb * 1.1
+    return on_target, final_size_kb, quality
 
 
 # ============================================================
@@ -186,6 +339,7 @@ BLOG_ARTICLES = {
         'date': '2026-05-04',
         'category': 'Keamanan',
         'reading_time': '6 menit',
+        'thumbnail': 'bahaya-data-KTP-pribadi.jpg',
     },
     # Nanti tambah artikel lain di sini
 }
@@ -198,6 +352,7 @@ def blog_index():
         {'slug': slug, **meta}
         for slug, meta in BLOG_ARTICLES.items()
     ]
+    articles.sort(key=lambda x: x['date'], reverse=True)
     return render_template('blog/index.html', articles=articles)
 
 
@@ -449,7 +604,11 @@ def api_merge_pdf():
 # ============================================================
 @app.route('/api/compress', methods=['POST'])
 def api_compress():
-    """API kompres foto dengan target size KB."""
+    """
+    API kompres foto dengan target size KB.
+    Mendukung output format: auto (default), jpg, png, webp.
+    """
+    # === Validasi file upload ===
     if 'file' not in request.files:
         return jsonify({'error': 'Gak ada file yang diupload'}), 400
 
@@ -460,6 +619,7 @@ def api_compress():
     if not allowed_image(file.filename):
         return jsonify({'error': 'Format gak didukung. Pake JPG/PNG/WebP ya'}), 400
 
+    # === Validasi target_kb ===
     try:
         target_kb = int(request.form.get('target_kb', 200))
         if target_kb < 10 or target_kb > 5000:
@@ -467,35 +627,71 @@ def api_compress():
     except ValueError:
         return jsonify({'error': 'Target size invalid'}), 400
 
+    # === Validasi output_format ===
+    output_format_param = request.form.get('output_format', 'auto').lower()
+    if output_format_param not in SUPPORTED_OUTPUT_FORMATS:
+        return jsonify({'error': 'Format output gak didukung'}), 400
+
+    # === Save uploaded file ===
     file_id = str(uuid.uuid4())
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    upload_filename = f"{file_id}.{ext}"
+    input_ext = file.filename.rsplit('.', 1)[1].lower()
+    upload_filename = f"{file_id}.{input_ext}"
     upload_path = os.path.join(app.config['UPLOAD_FOLDER'], upload_filename)
     file.save(upload_path)
 
     original_size_kb = round(os.path.getsize(upload_path) / 1024, 2)
 
-    output_filename = f"{file_id}_compressed.jpg"
+    # === Tentuin format output final ===
+    if output_format_param == 'auto':
+        # Auto: match format input (default behavior)
+        # BMP gak ideal sebagai output, fallback ke JPEG
+        if input_ext == 'bmp':
+            pil_format = 'JPEG'
+        else:
+            pil_format = PIL_FORMAT_MAP.get(input_ext, 'JPEG')
+    else:
+        pil_format = PIL_FORMAT_MAP[output_format_param]
+
+    output_ext = EXT_MAP[pil_format]
+    output_filename = f"{file_id}_compressed.{output_ext}"
     output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
 
-    success, final_size_kb, quality = compress_to_target_size(
-        upload_path, target_kb, output_path, 'JPEG'
-    )
+    # === Eksekusi kompresi ===
+    try:
+        success, final_size_kb, quality = compress_to_target_size(
+            upload_path, target_kb, output_path, pil_format
+        )
+    except Exception as e:
+        # Cleanup uploaded file kalo gagal
+        try:
+            os.remove(upload_path)
+        except OSError:
+            pass
+        app.logger.error(f"Compression failed for {file.filename}: {e}")
+        return jsonify({'error': 'Gagal kompres file. Coba file lain atau format berbeda.'}), 500
 
+    # === Cleanup uploaded file ===
     try:
         os.remove(upload_path)
     except OSError:
         pass
+
+    # === Build response ===
+    reduction_percent = (
+        round((1 - final_size_kb / original_size_kb) * 100, 1)
+        if original_size_kb > 0 else 0
+    )
 
     return jsonify({
         'success': True,
         'original_size_kb': original_size_kb,
         'final_size_kb': final_size_kb,
         'target_kb': target_kb,
-        'quality_used': quality,
-        'reduction_percent': round((1 - final_size_kb / original_size_kb) * 100, 1) if original_size_kb > 0 else 0,
+        'quality_used': quality,  # Bisa None untuk PNG (lossless)
+        'output_format': output_ext,  # NEW: format hasil ('jpg', 'png', 'webp')
+        'reduction_percent': reduction_percent,
         'download_url': f'/download/{output_filename}',
-        'on_target': final_size_kb <= target_kb
+        'on_target': success  # Pakai flag dari compressor (lebih akurat)
     })
 
 

@@ -79,7 +79,8 @@
 
                         <!-- Target size -->
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Target Ukuran File</label>
+                            <!-- <label class="form-label fw-semibold">Target Ukuran File</label> -->
+                            <label for="targetKb" class="form-label fw-semibold">Target Ukuran File</label>
                             <div class="input-group input-group-lg">
                                 <input type="number" class="form-control" id="targetKb" value="200" min="10" max="5000">
                                 <span class="input-group-text">KB</span>
@@ -95,6 +96,25 @@
                             <small class="text-muted d-block mt-2">
                                 <i class="bi bi-info-circle"></i> CPNS biasanya 200KB, lamaran kerja 500KB-1MB
                             </small>
+                        </div>
+
+                        <!-- Output format -->
+                        <div class="mb-4">
+                            <!-- <label class="form-label fw-semibold">Format Output</label> -->
+                            <label for="outputFormat" class="form-label fw-semibold">Format Output</label>
+                            <select class="form-select form-select-lg" id="outputFormat">
+                                <option value="auto" selected>Sama seperti asli (default)</option>
+                                <option value="jpg">JPG (paling kecil, tanpa transparansi)</option>
+                                <option value="png">PNG (kualitas tinggi, file lebih besar)</option>
+                                <option value="webp">WebP (kompresi modern terbaik)</option>
+                            </select>
+                            <small class="text-muted d-block mt-2" id="formatHint">
+                                <i class="bi bi-info-circle"></i> Default: hasil sama dengan format file yang lo upload
+                            </small>
+                            <div class="alert alert-warning border-0 mt-2 py-2 px-3 d-none" id="formatWarning" style="font-size: 0.875rem;">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span id="formatWarningText"></span>
+                            </div>
                         </div>
 
                         <!-- Action button -->
@@ -130,7 +150,7 @@
                                 </div>
                             </div>
                             <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
-                                <i class="bi bi-download"></i> Download Hasil
+                                <i class="bi bi-download"></i> Download Hasil <span id="resultFormat" class="badge bg-light text-success ms-1"></span>
                             </a>
                             <button class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
                                 <i class="bi bi-arrow-clockwise"></i> Kompres Foto Lain

@@ -15,6 +15,9 @@
     const resetBtn = document.getElementById('resetBtn');
     const adSlotResult = document.getElementById('adSlotResult');
     const presets = document.querySelectorAll('.preset');
+    const outputFormat = document.getElementById('outputFormat');
+    const formatWarning = document.getElementById('formatWarning');
+    const formatWarningText = document.getElementById('formatWarningText');
 
     let selectedFile = null;
 
@@ -40,9 +43,11 @@
         uploadZone.classList.remove('d-none');
         resultState.classList.add('d-none');
         errorState.classList.add('d-none');
-        adSlotResult.classList.add('d-none');
+        // adSlotResult.classList.add('d-none');
+        if (adSlotResult) adSlotResult.classList.add('d-none');
         compressBtn.disabled = true;
         compressBtn.classList.remove('d-none');
+        if (resultFormat) resultFormat.textContent = '';
     }
 
     function showError(msg) {
@@ -79,8 +84,36 @@
             targetKb.value = btn.dataset.kb;
             presets.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            updateFormatWarning();
         });
     });
+
+    // Update warning saat dropdown atau target KB berubah
+    function updateFormatWarning() {
+        const format = outputFormat.value;
+        const target = parseInt(targetKb.value) || 0;
+        const fileExt = selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : null;
+
+        let warning = '';
+
+        if (format === 'png' && target <= 300) {
+            warning = 'PNG kompresinya rendah. Untuk hit target di bawah 300KB, JPG lebih cocok.';
+        } else if (format === 'webp') {
+            warning = 'Pastikan platform tujuan support WebP. SSCASN gak terima WebP.';
+        } else if (format === 'jpg' && fileExt === 'png') {
+            warning = 'JPG gak support transparansi. Background transparan akan jadi putih.';
+        }
+
+        if (warning) {
+            formatWarningText.textContent = warning;
+            formatWarning.classList.remove('d-none');
+        } else {
+            formatWarning.classList.add('d-none');
+        }
+    }
+
+    outputFormat.addEventListener('change', updateFormatWarning);
+    targetKb.addEventListener('input', updateFormatWarning);
 
     compressBtn.addEventListener('click', async () => {
         if (!selectedFile) return;
@@ -98,6 +131,7 @@
         const formData = new FormData();
         formData.append('file', selectedFile);
         formData.append('target_kb', target);
+        formData.append('output_format', outputFormat.value);
 
         try {
             const res = await fetch('/api/compress', {
@@ -105,6 +139,9 @@
                 body: formData
             });
             const data = await res.json();
+
+            // console.log('DEBUG response:', data);   // ← TAMBAH INI
+            // console.log('DEBUG res.ok:', res.ok);   // ← TAMBAH INI
 
             loadingState.classList.add('d-none');
 
@@ -117,8 +154,10 @@
             document.getElementById('resultFinal').textContent = formatSize(data.final_size_kb);
             document.getElementById('resultReduction').textContent = data.reduction_percent + '%';
             downloadBtn.href = data.download_url;
+            if (resultFormat) resultFormat.textContent = data.output_format ? data.output_format.toUpperCase() : '';
             resultState.classList.remove('d-none');
-            adSlotResult.classList.remove('d-none');
+            // adSlotResult.classList.remove('d-none');
+            if (adSlotResult) adSlotResult.classList.remove('d-none');
         } catch (err) {
             showError('Network error, coba refresh ya');
         }
