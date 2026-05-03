@@ -252,3 +252,28 @@ body {
     width: 100%;
     height: auto;
 }
+
+
+/* Floating WA Button */
+.wa-float-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366; /* Warna ijo WhatsApp */
+    color: white;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: 600;
+    text-decoration: none;
+    z-index: 1000; /* Biar selalu di atas elemen lain */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.wa-float-btn:hover {
+    background-color: #128c7e;
+    color: white;
+    transform: translateY(-3px);
+}
