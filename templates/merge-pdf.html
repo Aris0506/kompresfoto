@@ -179,10 +179,12 @@
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
+    let sortableInstance = null; // ← tambah variable buat track Sortable instance
+
     function renderFilesList() {
         filesItems.innerHTML = selectedFiles.map((file, idx) => `
-            <div class="list-group-item d-flex align-items-center" data-idx="${idx}">
-                <i class="bi bi-grip-vertical text-muted me-2" style="cursor: grab;"></i>
+            <div class="list-group-item d-flex align-items-center sortable-item" data-idx="${idx}" style="touch-action: none; cursor: grab;">
+                <i class="bi bi-grip-vertical text-muted me-2"></i>
                 <i class="bi bi-file-earmark-pdf text-danger me-3 fs-4"></i>
                 <div class="flex-grow-1">
                     <div class="fw-semibold">${idx + 1}. ${file.name}</div>
@@ -209,11 +211,19 @@
             });
         });
 
-        // Init Sortable for drag & drop reorder
-        if (window.Sortable) {
-            Sortable.create(filesItems, {
+        // Init Sortable HANYA SEKALI (gak re-init tiap render)
+        if (window.Sortable && !sortableInstance) {
+            sortableInstance = Sortable.create(filesItems, {
                 animation: 150,
-                handle: '.bi-grip-vertical',
+                // Mobile-friendly settings:
+                forceFallback: true,            // pake touch handler Sortable (lebih reliable di mobile)
+                fallbackTolerance: 5,           // toleransi gerakan jari
+                delay: 100,                     // hold 100ms sebelum drag (biar gak conflict sama scroll)
+                delayOnTouchOnly: true,         // delay HANYA di touch (mouse langsung drag)
+                touchStartThreshold: 5,         // toleransi pergeseran touch
+                // Drag handle = whole item (kecuali tombol delete)
+                filter: '.remove-file-btn, .remove-file-btn *',
+                preventOnFilter: false,
                 onEnd: (evt) => {
                     // Reorder selectedFiles array based on new DOM order
                     const newOrder = [];
@@ -268,6 +278,10 @@
         mergeBtn.classList.remove('d-none');
         mergeBtn.disabled = true;
         mergeBtn.innerHTML = '<i class="bi bi-magic"></i> Gabungkan PDF';
+        // Destroy Sortable instance biar bisa di-init ulang next time
+        if (sortableInstance) {
+            sortableInstance.destroy();
+            sortableInstance = null;
     }
 
     function showError(msg) {
