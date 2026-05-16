@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Ganti Background Foto AI - PNG Transparent / Background Custom | Kompresin.my.id{% endblock %}
+{% block description %}Ganti background foto pakai AI. Pilih warna preset atau custom warna apapun, atau export PNG transparent buat sticker WhatsApp & e-commerce. 100% browser, gratis tanpa watermark.{% endblock %}
+
+{% block content %}
+<section class="hero py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-5 fw-bold mb-3">Ganti Background <span class="text-primary">AI</span></h1>
+                <p class="lead text-muted">Auto-remove background pakai AI, ganti ke <strong>warna apapun</strong> atau export <strong>PNG transparent</strong>. Cocok buat sticker WhatsApp, profile picture, e-commerce, atau apa aja.</p>
+                <div class="d-flex gap-2 justify-content-center justify-content-lg-start flex-wrap mt-3">
+                    <span class="badge bg-light text-dark border"><i class="bi bi-shield-check text-success"></i> 100% Browser (privacy)</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-palette text-primary"></i> Warna bebas</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-file-image text-warning"></i> PNG / JPG output</span>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <img src="{{ url_for('static', filename='images/tools/tool-background.svg') }}" 
+                    alt="Ganti background foto dengan AI" 
+                    class="img-fluid tool-illustration"
+                    loading="eager"
+                    onerror="this.style.display='none'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+
+                        <!-- STATE 1: Upload Zone (with pre-selectors) -->
+                        <div id="uploadZone" class="text-center mb-4">
+                            
+                            <!-- Petunjuk -->
+                            <div class="alert alert-info border-0 text-start mb-4">
+                                <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill"></i> Petunjuk:</h6>
+                                <p class="mb-0 small">
+                                    Pilih <strong>output mode</strong> dulu (warna atau transparent). 
+                                    AI akan langsung proses. <strong>Tenang</strong> — bisa ubah lagi setelah hasil keluar.
+                                </p>
+                            </div>
+
+                            <!-- Output mode selector -->
+                            <div class="mb-4 text-start">
+                                <label class="fw-semibold mb-2 d-block">1. Pilih Output:</label>
+                                <div class="btn-group w-100 mb-3" role="group">
+                                    <button type="button" class="btn btn-outline-primary mode-btn-pre active" data-mode="color">
+                                        <i class="bi bi-palette-fill"></i> Warna Background
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary mode-btn-pre" data-mode="transparent">
+                                        <i class="bi bi-image-alt"></i> Transparent PNG
+                                    </button>
+                                </div>
+
+                                <!-- Color picker (visible kalo mode=color) -->
+                                <div id="colorPickerPre" class="mb-3">
+                                    <label class="fw-semibold mb-2 d-block">2. Pilih Warna:</label>
+                                    <div class="d-flex flex-wrap gap-2 mb-2">
+                                        <button type="button" class="btn color-preset-pre active" data-color="#FFFFFF" style="background:#FFFFFF; border:2px solid #dee2e6;" title="Putih"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#000000" style="background:#000000;" title="Hitam"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#FF0000" style="background:#FF0000;" title="Merah"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#0066CC" style="background:#0066CC;" title="Biru"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#00AA00" style="background:#00AA00;" title="Hijau"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#FFD700" style="background:#FFD700;" title="Kuning"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#FFC0CB" style="background:#FFC0CB;" title="Pink"></button>
+                                        <button type="button" class="btn color-preset-pre" data-color="#808080" style="background:#808080;" title="Abu-abu"></button>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="text-muted small mb-0">Atau pilih sendiri:</label>
+                                        <input type="color" id="colorCustomPre" class="form-control form-control-color" value="#FFFFFF">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload area -->
+                            <div class="upload-zone text-center p-5">
+                                <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                                <h4 class="mb-2">3. Upload foto kamu</h4>
+                                <p class="text-muted mb-3">JPG/PNG, max 10MB.<br><strong>Foto tidak diupload ke server (100% browser).</strong></p>
+                                <input type="file" id="fileInput" accept="image/jpeg,image/png" hidden>
+                                <button class="btn btn-primary btn-lg" id="selectFileBtn">
+                                    <i class="bi bi-folder2-open"></i> Pilih Foto & Proses
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- STATE 2: AI Loading -->
+                        <div id="aiLoadingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <h5>🤖 AI sedang loading (sekali aja)...</h5>
+                            <p class="text-muted mb-3" id="aiLoadingDetail">Persiapan model: ~45MB, cached after download</p>
+                            <div class="progress" style="height: 24px;">
+                                <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%">0%</div>
+                            </div>
+                            <small class="text-muted d-block mt-3">
+                                💡 Tip: Setelah model cached, next time langsung instant
+                            </small>
+                        </div>
+
+                        <!-- STATE 3: Processing -->
+                        <div id="processingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-3 mb-0">Lagi remove background... bentar ya</p>
+                        </div>
+
+                        <!-- STATE 4: Preview -->
+                        <div id="previewState" class="d-none">
+                            <h6 class="fw-semibold mb-3">Preview Hasil:</h6>
+                            <div class="text-center mb-4" style="background-image: linear-gradient(45deg, #ddd 25%, transparent 25%), linear-gradient(-45deg, #ddd 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ddd 75%), linear-gradient(-45deg, transparent 75%, #ddd 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, 10px 0px; border-radius: 8px; padding: 10px;">
+                                <canvas id="previewCanvas" style="max-width: 100%; max-height: 500px;"></canvas>
+                            </div>
+
+                            <!-- Output mode (adjust after preview) -->
+                            <div class="mb-3">
+                                <label class="fw-semibold mb-2 d-block">Ganti Output <small class="text-muted">(live preview)</small>:</label>
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-outline-primary mode-btn active" data-mode="color">
+                                        <i class="bi bi-palette-fill"></i> Warna Background
+                                    </button>
+                                    <button class="btn btn-outline-primary mode-btn" data-mode="transparent">
+                                        <i class="bi bi-image-alt"></i> Transparent PNG
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Color picker (visible kalo mode=color) -->
+                            <div id="colorPicker" class="mb-3">
+                                <label class="fw-semibold mb-2 d-block">Ganti Warna:</label>
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    <button class="btn color-preset active" data-color="#FFFFFF" style="background:#FFFFFF; border:2px solid #dee2e6;" title="Putih"></button>
+                                    <button class="btn color-preset" data-color="#000000" style="background:#000000;" title="Hitam"></button>
+                                    <button class="btn color-preset" data-color="#FF0000" style="background:#FF0000;" title="Merah"></button>
+                                    <button class="btn color-preset" data-color="#0066CC" style="background:#0066CC;" title="Biru"></button>
+                                    <button class="btn color-preset" data-color="#00AA00" style="background:#00AA00;" title="Hijau"></button>
+                                    <button class="btn color-preset" data-color="#FFD700" style="background:#FFD700;" title="Kuning"></button>
+                                    <button class="btn color-preset" data-color="#FFC0CB" style="background:#FFC0CB;" title="Pink"></button>
+                                    <button class="btn color-preset" data-color="#808080" style="background:#808080;" title="Abu-abu"></button>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-muted small mb-0">Atau pilih sendiri:</label>
+                                    <input type="color" id="colorCustom" class="form-control form-control-color" value="#FFFFFF">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-success btn-lg w-100 mb-2" id="downloadBtn">
+                                <i class="bi bi-download"></i> Download <span id="downloadFormat">JPG</span>
+                            </button>
+                            <button class="btn btn-outline-secondary w-100" id="resetBtn">
+                                <i class="bi bi-arrow-clockwise"></i> Upload Foto Lain
+                            </button>
+                        </div>
+
+                        <!-- Error -->
+                        <div id="errorState" class="alert alert-danger d-none mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- CSS untuk color preset buttons -->
+                <style>
+                    .color-preset, .color-preset-pre {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        border: 2px solid transparent;
+                        padding: 0;
+                    }
+                    .color-preset.active, .color-preset-pre.active {
+                        border: 3px solid #0066CC;
+                        transform: scale(1.1);
+                    }
+                </style>
+
+                <!-- SEO Section -->
+                <div class="mt-5">
+                    <h3 class="fw-bold mb-3">Tentang Ganti Background AI</h3>
+                    <p class="text-muted">Ganti Background AI Kompresin menggunakan teknologi <strong>AI client-side</strong> — semua proses terjadi di browser kamu. Foto kamu <strong>tidak pernah diupload ke server</strong>.</p>
+                    
+                    <h5 class="fw-bold mt-4">Use Cases</h5>
+                    <ul class="text-muted">
+                        <li><strong>Sticker WhatsApp</strong>: Export PNG transparent, import ke WhatsApp sticker maker</li>
+                        <li><strong>Profile Picture</strong>: Background warna unik untuk social media (Instagram, LinkedIn, Twitter)</li>
+                        <li><strong>E-commerce</strong>: Foto produk dengan background putih bersih untuk marketplace (Tokopedia, Shopee)</li>
+                        <li><strong>Design Material</strong>: PNG transparent buat dipake di Canva, Figma, atau design app lain</li>
+                        <li><strong>Foto Acara</strong>: Ganti background biar foto event lo lebih konsisten warnanya</li>
+                    </ul>
+
+                    <h5 class="fw-bold mt-4">Tips Foto yang Bagus</h5>
+                    <ul class="text-muted">
+                        <li>Pencahayaan rata, hindari shadow terlalu kuat</li>
+                        <li>Subject jelas terpisah dari background asli</li>
+                        <li>Resolusi minimal 800x800 px untuk hasil sharp</li>
+                        <li>Hindari rambut/objek tipis di pinggir (AI agak struggle di edge fine)</li>
+                    </ul>
+
+                    <h5 class="fw-bold mt-4">Butuh Pas Foto?</h5>
+                    <p class="text-muted">Kalau lo butuh pas foto dengan ukuran standar (2x3, 3x4, 4x6 cm) untuk CPNS, ijazah, atau lamaran kerja, pake <a href="/pas-foto" class="text-primary">Pas Foto AI Maker</a> yang sudah dilengkapi ukuran standar Indonesia.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/ganti-background.js') }}"></script>
+{% endblock %}

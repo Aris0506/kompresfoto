@@ -276,9 +276,8 @@ def pas_foto_page():
 
 @app.route('/ganti-background')
 def ganti_bg_page():
-    """Halaman ganti background (Phase 3 - coming soon placeholder)"""
-    return render_template('tool_coming_soon.html', tool_name='Ganti Background Foto', tool_slug='ganti-background')
-
+    """Halaman ganti background - LIVE"""
+    return render_template('ganti-background.html')
 
 
 @app.route('/kompres-pdf')
