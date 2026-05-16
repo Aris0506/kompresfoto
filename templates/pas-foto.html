@@ -1,21 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Pas Foto Maker AI - 2x3, 3x4, 4x6 | Coming Soon | Kompresin.my.id{% endblock %}
-{% block description %}Pas foto AI segera hadir di Kompresin.my.id. Auto remove background, ukuran 2x3/3x4/4x6, background merah/biru/putih. Cocok buat CPNS, ijazah, lamaran kerja.{% endblock %}
+{% block title %}Pas Foto Maker AI - 2x3, 3x4, 4x6 | Kompresin.my.id{% endblock %}
+{% block description %}Pas foto AI di browser. Auto remove background, ukuran 2x3/3x4/4x6, background merah/biru/putih. Cocok buat CPNS, ijazah, lamaran kerja. Privacy: foto tidak diupload ke server.{% endblock %}
 
 {% block content %}
 <section class="hero py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-7 text-center text-lg-start">
-                <div class="badge bg-warning text-dark fs-6 mb-3 px-3 py-2">
-                    🚧 Launching dalam 3 hari!
-                </div>
-                <h1 class="display-5 fw-bold mb-3">Pas Foto Maker <span class="text-primary">dengan AI</span></h1>
-                <p class="lead text-muted">Lagi upgrade ke <strong>AI premium quality</strong> biar hasil pas foto lo dewa. Background otomatis ke-remove, hasil rapi tanpa edit manual. <strong>Free unlimited.</strong></p>
+                <h1 class="display-5 fw-bold mb-3">Pas Foto Maker <span class="text-primary">AI</span></h1>
+                <p class="lead text-muted">Upload foto, AI auto-remove background, pilih ukuran & warna. Hasil <strong>print-ready DPI 300</strong>. Cocok buat CPNS, ijazah, lamaran kerja.</p>
                 <div class="d-flex gap-2 justify-content-center justify-content-lg-start flex-wrap mt-3">
-                    <span class="badge bg-light text-dark border"><i class="bi bi-stars text-warning"></i> AI Auto Remove</span>
-                    <span class="badge bg-light text-dark border"><i class="bi bi-infinity text-primary"></i> Unlimited free</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-shield-check text-success"></i> 100% Browser (privacy)</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-stars text-warning"></i> AI Premium</span>
                     <span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success"></i> Print-ready DPI 300</span>
                 </div>
             </div>
@@ -29,86 +26,142 @@
     </div>
 </section>
 
-{% if ads_enabled %}
-<!-- Adsterra Banner 300x250 (setelah hasil keluar) -->
-<div class="ad-slot text-center my-4 p-3 bg-light rounded d-none" id="adSlotResult">
-    <small class="text-muted d-block mb-2">Iklan</small>
-    <div style="display: flex; justify-content: center;">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : 'd4c1966bed2135f18595a1ed7645db4b',
-                'format' : 'iframe',
-                'height' : 250,
-                'width' : 300,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/d4c1966bed2135f18595a1ed7645db4b/invoke.js"></script>
-    </div>
-</div>
-{% endif %}
-
 <section class="py-4">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
-                    <div class="card-body p-4 p-md-5 text-center">
-                        <div class="mb-4">
-                            <i class="bi bi-tools text-primary" style="font-size: 4rem;"></i>
-                        </div>
-                        <h3 class="fw-bold mb-3">Lagi Upgrade ke AI Premium</h3>
-                        <p class="text-muted mb-4">
-                            Algoritma manual hasilnya kurang memuaskan, jadi kami sedang upgrade ke AI quality untuk hasil yang dewa. <strong>3 hari lagi siap!</strong>
-                        </p>
+                    <div class="card-body p-4 p-md-5">
 
-                        <div class="alert alert-info border-0 text-start">
-                            <h6 class="fw-bold"><i class="bi bi-info-circle-fill"></i> Apa yang akan ada?</h6>
-                            <ul class="mb-0">
-                                <li><strong>AI Auto Remove Background</strong> — bisa untuk foto apapun, gak perlu bg polos</li>
-                                <li><strong>Ukuran standar Indonesia</strong>: 2x3, 3x4, 4x6 cm (DPI 300, print-ready)</li>
-                                <li><strong>3 warna background</strong>: merah, biru, putih</li>
-                                <li><strong>Free unlimited</strong> — gak ada batas pemakaian</li>
-                            </ul>
+                        <!-- STATE 1: Upload Zone (with pre-selectors) -->
+                        <div id="uploadZone" class="text-center mb-4">
+                            <!-- Pre-selectors: user bisa pilih default sebelum upload -->
+                            <div class="mb-4">
+                                <label class="fw-semibold mb-2 d-block">1. Pilih Warna Background:</label>
+                                <div class="btn-group w-100 mb-3" role="group">
+                                    <button type="button" class="btn btn-outline-danger bg-color-btn-pre" data-color="#FF0000">
+                                        <i class="bi bi-circle-fill text-danger"></i> Merah
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary bg-color-btn-pre active" data-color="#0066CC">
+                                        <i class="bi bi-circle-fill text-primary"></i> Biru
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary bg-color-btn-pre" data-color="#FFFFFF">
+                                        <i class="bi bi-circle-fill text-light border"></i> Putih
+                                    </button>
+                                </div>
+                                
+                                <label class="fw-semibold mb-2 d-block">2. Pilih Ukuran:</label>
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn btn-outline-primary size-btn-pre" data-w="2" data-h="3">2x3 cm</button>
+                                    <button type="button" class="btn btn-outline-primary size-btn-pre active" data-w="3" data-h="4">3x4 cm</button>
+                                    <button type="button" class="btn btn-outline-primary size-btn-pre" data-w="4" data-h="6">4x6 cm</button>
+                                </div>
+                            </div>
+
+                            <!-- Upload area -->
+                            <div class="upload-zone text-center p-5">
+                                <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                                <h4 class="mb-2">3. Upload foto kamu</h4>
+                                <p class="text-muted mb-3">JPG/PNG, max 10MB.<br><strong>Foto tidak diupload ke server (100% browser).</strong></p>
+                                <input type="file" id="fileInput" accept="image/jpeg,image/png" hidden>
+                                <button class="btn btn-primary btn-lg" id="selectFileBtn">
+                                    <i class="bi bi-folder2-open"></i> Pilih Foto & Proses
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="mt-4">
-                            <a href="/" class="btn btn-primary btn-lg">
-                                <i class="bi bi-magic"></i> Sementara, Coba Kompres Foto
-                            </a>
+                        <!-- STATE 2: AI Loading (first time only) -->
+                        <div id="aiLoadingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <h5>🤖 AI sedang loading (sekali aja)...</h5>
+                            <p class="text-muted mb-3" id="aiLoadingDetail">Persiapan model: ~45MB, cached after download</p>
+                            <div class="progress" style="height: 24px;">
+                                <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%">0%</div>
+                            </div>
+                            <small class="text-muted d-block mt-3" id="aiLoadingTip">
+                                💡 Tip: Background merah = lahir tahun ganjil (SSCASN)
+                            </small>
                         </div>
+
+                        <!-- STATE 3: Processing -->
+                        <div id="processingState" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-3 mb-0">Lagi remove background... bentar ya</p>
+                        </div>
+
+                        <!-- STATE 4: Preview & Tools (after AI process) -->
+                        <div id="previewState" class="d-none">
+                            <h6 class="fw-semibold mb-3">Preview Pas Foto:</h6>
+                            <div class="text-center mb-4">
+                                <canvas id="previewCanvas" style="max-width: 100%; border: 1px solid #dee2e6; border-radius: 8px;"></canvas>
+                            </div>
+
+                            <!-- Background Color -->
+                            <div class="mb-3">
+                                <label class="fw-semibold mb-2 d-block">Ganti Warna Background <small class="text-muted">(live preview, no re-process)</small>:</label>
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-outline-danger bg-color-btn" data-color="#FF0000">
+                                        <i class="bi bi-circle-fill text-danger"></i> Merah
+                                    </button>
+                                    <button class="btn btn-outline-primary bg-color-btn active" data-color="#0066CC">
+                                        <i class="bi bi-circle-fill text-primary"></i> Biru
+                                    </button>
+                                    <button class="btn btn-outline-secondary bg-color-btn" data-color="#FFFFFF">
+                                        <i class="bi bi-circle-fill text-light border"></i> Putih
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Size -->
+                            <div class="mb-3">
+                                <label class="fw-semibold mb-2 d-block">Ganti Ukuran <small class="text-muted">(live preview)</small>:</label>
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-outline-primary size-btn" data-w="2" data-h="3">2x3 cm</button>
+                                    <button class="btn btn-outline-primary size-btn active" data-w="3" data-h="4">3x4 cm</button>
+                                    <button class="btn btn-outline-primary size-btn" data-w="4" data-h="6">4x6 cm</button>
+                                </div>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <button class="btn btn-success btn-lg w-100 mb-2" id="downloadBtn">
+                                <i class="bi bi-download"></i> Download JPG (DPI 300)
+                            </button>
+                            <button class="btn btn-outline-secondary w-100" id="resetBtn">
+                                <i class="bi bi-arrow-clockwise"></i> Upload Foto Lain
+                            </button>
+                        </div>
+
+                        <!-- Error -->
+                        <div id="errorState" class="alert alert-danger d-none mt-3"></div>
                     </div>
                 </div>
 
-                <!-- Tips section (good for SEO) -->
+                <!-- SEO Section -->
                 <div class="mt-5">
-                    <h3 class="fw-bold mb-3">Tentang Pas Foto di Indonesia</h3>
-                    <p class="text-muted">Pas foto adalah salah satu dokumen yang paling sering dibutuhkan untuk berbagai keperluan administrasi di Indonesia. Berikut beberapa hal yang perlu diketahui:</p>
+                    <h3 class="fw-bold mb-3">Tentang Pas Foto AI</h3>
+                    <p class="text-muted">Pas Foto Maker Kompresin menggunakan teknologi <strong>AI client-side</strong> — semua proses terjadi di browser kamu. Foto kamu <strong>tidak pernah diupload ke server</strong>, sesuai prinsip UU PDP (Perlindungan Data Pribadi).</p>
                     
-                    <h5 class="fw-bold mt-4">Ukuran Standard Pas Foto</h5>
+                    <h5 class="fw-bold mt-4">Ukuran Standard Pas Foto Indonesia</h5>
                     <ul class="text-muted">
-                        <li><strong>2x3 cm</strong>: Untuk dokumen kecil, kartu pelajar, kartu identitas internal</li>
-                        <li><strong>3x4 cm</strong>: Paling umum, dipakai untuk SKCK, ijazah, lamaran kerja, KTP, SIM</li>
-                        <li><strong>4x6 cm</strong>: Untuk dokumen formal yang butuh foto lebih besar, beberapa formulir bank, paspor</li>
+                        <li><strong>2x3 cm</strong>: Kartu pelajar, kartu identitas internal</li>
+                        <li><strong>3x4 cm</strong>: SKCK, ijazah, lamaran kerja, KTP, SIM (paling umum)</li>
+                        <li><strong>4x6 cm</strong>: Paspor, formulir bank, dokumen formal</li>
                     </ul>
 
-                    <h5 class="fw-bold mt-4">Warna Background untuk SSCASN/CPNS</h5>
+                    <h5 class="fw-bold mt-4">Background untuk SSCASN/CPNS</h5>
                     <ul class="text-muted">
-                        <li><strong>Background Merah</strong>: Untuk pelamar yang lahir di tahun ganjil</li>
-                        <li><strong>Background Biru</strong>: Untuk pelamar yang lahir di tahun genap</li>
-                        <li><strong>Background Putih</strong>: Untuk dokumen umum (ijazah, KTP, SIM)</li>
-                    </ul>
-
-                    <h5 class="fw-bold mt-4">Tips Persiapan Foto</h5>
-                    <ul class="text-muted">
-                        <li>Pakai baju formal warna kontras (bukan warna sama dengan background pilihan)</li>
-                        <li>Pencahayaan rata, hindari shadow di muka</li>
-                        <li>Ekspresi netral, mata terbuka, tidak pakai kacamata gelap</li>
-                        <li>Rambut rapi, tidak menutupi wajah</li>
+                        <li><strong>Merah</strong>: Pelamar lahir tahun ganjil</li>
+                        <li><strong>Biru</strong>: Pelamar lahir tahun genap</li>
+                        <li><strong>Putih</strong>: Dokumen umum (ijazah, KTP, SIM)</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pas-foto.js') }}"></script>
 {% endblock %}
