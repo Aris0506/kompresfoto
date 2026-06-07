@@ -9,18 +9,39 @@ Struktur:
 - /ganti-background → (coming next)
 - /kompres-pdf   → (coming next)
 """
+
 import os
 import io
+import time
 import uuid
+from functools import wraps
 from flask import Flask, render_template, request, jsonify, send_file, after_this_request
-from PIL import Image
+from PIL import Image, ImageOps
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload (buat PDF gede)
+
+# Request hard limit.
+# UI kamu sekarang:
+# - Foto max 5MB
+# - Kompres PDF max 15MB
+# - Merge PDF max 15MB total
+#
+# Kita kasih 20MB agar multipart/form-data masih punya sedikit overhead.
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['COMPRESSED_FOLDER'] = 'compressed'
 
+# Batas upload per fitur. Ini tidak mengubah kualitas hasil.
+# Ini cuma melindungi server kecil agar tidak disiksa file terlalu besar.
+MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024
+MAX_PDF_UPLOAD_BYTES = 15 * 1024 * 1024
+MAX_MERGE_UPLOAD_BYTES = 15 * 1024 * 1024
+
+# File hasil yang tidak didownload akan dibersihkan otomatis.
+FILE_TTL_SECONDS = int(os.environ.get('FILE_TTL_SECONDS', 60 * 60))  # default 1 jam
+CLEANUP_INTERVAL_SECONDS = int(os.environ.get('CLEANUP_INTERVAL_SECONDS', 5 * 60))  # cek tiap 5 menit
 
 # ============================================================
 # FEATURE FLAGS — Monetization Toggle
@@ -58,6 +79,199 @@ EXT_MAP = {
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['COMPRESSED_FOLDER'], exist_ok=True)
+
+# ============================================================
+# PRODUCTION SAFETY HELPERS
+# Tidak menyentuh kualitas kompresi.
+# Ini cuma jaga server tetap sehat.
+# ============================================================
+
+_last_cleanup_at = 0
+_rate_limit_buckets = {}
+
+
+def remove_quietly(path):
+    """Hapus file tanpa bikin request gagal kalau file sudah tidak ada."""
+    try:
+        if path and os.path.exists(path):
+            os.remove(path)
+    except OSError:
+        pass
+
+
+def cleanup_paths(paths):
+    for path in paths:
+        remove_quietly(path)
+
+
+def cleanup_old_files(force=False):
+    """
+    Bersihkan file upload/hasil lama.
+
+    Penting karena user bisa saja:
+    - upload file,
+    - proses selesai,
+    - tapi tidak klik download.
+
+    Kalau tidak dibersihkan, folder compressed bisa numpuk.
+    """
+    global _last_cleanup_at
+
+    now = time.time()
+
+    if not force and (now - _last_cleanup_at) < CLEANUP_INTERVAL_SECONDS:
+        return
+
+    _last_cleanup_at = now
+
+    folders = [
+        app.config['UPLOAD_FOLDER'],
+        app.config['COMPRESSED_FOLDER'],
+    ]
+
+    for folder in folders:
+        try:
+            for filename in os.listdir(folder):
+                path = os.path.join(folder, filename)
+
+                if not os.path.isfile(path):
+                    continue
+
+                file_age = now - os.path.getmtime(path)
+
+                if file_age > FILE_TTL_SECONDS:
+                    remove_quietly(path)
+
+        except OSError as e:
+            app.logger.warning(f"Cleanup folder gagal: {folder} - {e}")
+
+
+@app.before_request
+def run_light_cleanup():
+    """
+    Cleanup ringan.
+    Tidak benar-benar scan tiap request karena ada interval 5 menit.
+    Jadi aman untuk production kecil.
+    """
+    cleanup_old_files()
+
+@app.after_request
+def add_security_headers(response):
+    """
+    Header keamanan ringan untuk production.
+    Tidak mengubah fitur dan tidak mengubah kualitas hasil file.
+    """
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
+
+    return response
+
+
+def client_ip():
+    """
+    Ambil IP user.
+    Cukup aman untuk setup umum di belakang proxy/Nginx/Cloudflare.
+    """
+    forwarded = request.headers.get('X-Forwarded-For', '')
+
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+
+    return request.remote_addr or 'unknown'
+
+
+def rate_limit(max_requests, window_seconds):
+    """
+    Rate limit ringan in-memory.
+
+    Ini cukup untuk VPS kecil 1 proses.
+    Kalau nanti sudah multi-server/traffic besar, baru pindah ke Redis.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            now = time.time()
+            key = (request.endpoint or func.__name__, client_ip())
+            window_start = now - window_seconds
+
+            hits = [
+                ts for ts in _rate_limit_buckets.get(key, [])
+                if ts > window_start
+            ]
+
+            if len(hits) >= max_requests:
+                return jsonify({
+                    'error': 'Terlalu banyak request dari perangkat ini. Coba lagi sebentar ya.'
+                }), 429
+
+            hits.append(now)
+            _rate_limit_buckets[key] = hits
+
+            # Bersihkan bucket lama biar dict tidak tumbuh terus.
+            if len(_rate_limit_buckets) > 5000:
+                for old_key in list(_rate_limit_buckets.keys()):
+                    recent_hits = [
+                        ts for ts in _rate_limit_buckets[old_key]
+                        if ts > window_start
+                    ]
+
+                    if recent_hits:
+                        _rate_limit_buckets[old_key] = recent_hits
+                    else:
+                        del _rate_limit_buckets[old_key]
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def mb_text(byte_size):
+    return f"{byte_size / (1024 * 1024):.0f}MB"
+
+
+def reject_if_request_too_large(max_bytes, label='File'):
+    """
+    Cek ukuran request sebelum disimpan.
+
+    Ada toleransi 1MB karena multipart/form-data punya overhead.
+    """
+    multipart_overhead = 1024 * 1024
+
+    if request.content_length and request.content_length > (max_bytes + multipart_overhead):
+        return jsonify({
+            'error': f'{label} terlalu besar. Maksimal {mb_text(max_bytes)}.'
+        }), 413
+
+    return None
+
+
+def is_probably_pdf(path):
+    """
+    Validasi ringan bahwa file benar-benar terlihat seperti PDF,
+    bukan cuma nama file .pdf.
+    """
+    try:
+        with open(path, 'rb') as f:
+            return f.read(5) == b'%PDF-'
+    except OSError:
+        return False
+
+
+def is_real_image(path):
+    """
+    Validasi ringan bahwa file benar-benar image valid.
+    """
+    try:
+        with Image.open(path) as img:
+            img.verify()
+        return True
+    except Exception:
+        return False
+    
 
 
 def allowed_image(filename):
@@ -100,28 +314,258 @@ def _prepare_image_for_format(img, output_format):
         return img
 
 
-def _compress_jpeg(img, target_bytes, output_path):
+def _normalize_compression_mode(mode):
     """
-    JPEG compression: binary search quality + adaptive resize.
-    Quality range: 10-95 (di bawah 10 noise terlalu parah).
+    Mode kompresi aman.
+    - fast      : lebih cepat, masih dijaga agar tidak terlalu pecah
+    - balanced  : default, aman untuk mayoritas user
+    - quality   : lebih menjaga detail, bisa lebih besar/lambat
     """
-    original_width, original_height = img.size
+    mode = (mode or 'balanced').lower().strip()
 
-    for resize_factor in [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
-        if resize_factor < 1.0:
-            new_size = (int(original_width * resize_factor), int(original_height * resize_factor))
-            test_img = img.resize(new_size, Image.LANCZOS)
-        else:
-            test_img = img
+    aliases = {
+        'cepat': 'fast',
+        'seimbang': 'balanced',
+        'kualitas': 'quality',
+        'quality_max': 'quality',
+        'max': 'quality',
+    }
 
-        low, high = 10, 95
-        best_buffer = None
+    normalized = aliases.get(mode, mode)
+    return normalized if normalized in ('fast', 'balanced', 'quality') else 'balanced'
+
+
+IMAGE_QUALITY_PROFILES = {
+    'fast': {
+        'jpeg_min_quality': 55,
+        'webp_min_quality': 50,
+        'min_long_edge': 850,
+        'resize_boost': 0.90,
+    },
+    'balanced': {
+        'jpeg_min_quality': 65,
+        'webp_min_quality': 60,
+        'min_long_edge': 1000,
+        'resize_boost': 1.00,
+    },
+    'quality': {
+        'jpeg_min_quality': 75,
+        'webp_min_quality': 70,
+        'min_long_edge': 1200,
+        'resize_boost': 1.15,
+    },
+}
+
+
+def _smart_start_edge(target_kb, output_format='JPEG'):
+    """
+    Tentukan sisi terpanjang awal berdasarkan target KB.
+    Tujuannya: jangan encode foto 4000px berkali-kali kalau targetnya cuma 200KB.
+    """
+    if output_format == 'PNG':
+        # PNG biasanya lebih besar, jadi start edge dibuat lebih konservatif.
+        if target_kb <= 150:
+            return 1000
+        if target_kb <= 300:
+            return 1300
+        if target_kb <= 600:
+            return 1700
+        if target_kb <= 1200:
+            return 2300
+        if target_kb <= 2500:
+            return 3200
+        return 5000
+
+    # JPEG / WEBP
+    if target_kb <= 80:
+        return 950
+    if target_kb <= 150:
+        return 1200
+    if target_kb <= 250:
+        return 1600
+    if target_kb <= 500:
+        return 2100
+    if target_kb <= 1000:
+        return 2800
+    if target_kb <= 2000:
+        return 3600
+    return 5000
+
+
+def _candidate_long_edges(img, target_kb, output_format, mode):
+    """
+    Buat daftar ukuran percobaan dari besar ke kecil,
+    tapi tidak turun melewati batas aman agar hasil tidak jadi kotak-kotak.
+    """
+    mode = _normalize_compression_mode(mode)
+    profile = IMAGE_QUALITY_PROFILES[mode]
+
+    original_w, original_h = img.size
+    original_long_edge = max(original_w, original_h)
+
+    start_edge = int(_smart_start_edge(target_kb, output_format) * profile['resize_boost'])
+    start_edge = min(start_edge, original_long_edge)
+
+    floor_edge = min(profile['min_long_edge'], original_long_edge)
+
+    raw_edges = [
+        start_edge,
+        int(start_edge * 0.90),
+        int(start_edge * 0.80),
+        int(start_edge * 0.70),
+        floor_edge,
+    ]
+
+    edges = []
+    for edge in raw_edges:
+        edge = max(floor_edge, min(edge, original_long_edge))
+        if edge not in edges:
+            edges.append(edge)
+
+    # Dari besar ke kecil. Begitu target tercapai, kualitas visual biasanya masih bagus.
+    edges.sort(reverse=True)
+    return edges
+
+
+def _resize_to_long_edge(img, max_long_edge):
+    """Resize proporsional berdasarkan sisi terpanjang. Tidak pernah upscale."""
+    w, h = img.size
+    long_edge = max(w, h)
+
+    if long_edge <= max_long_edge:
+        return img.copy()
+
+    ratio = max_long_edge / long_edge
+    new_w = max(1, int(w * ratio))
+    new_h = max(1, int(h * ratio))
+    return img.resize((new_w, new_h), Image.LANCZOS)
+
+
+def _save_jpeg_buffer(img, quality, optimize=False):
+    buffer = io.BytesIO()
+    img.save(
+        buffer,
+        format='JPEG',
+        quality=quality,
+        optimize=optimize,
+        progressive=False,
+    )
+    return buffer
+
+
+def _save_webp_buffer(img, quality, method=4):
+    buffer = io.BytesIO()
+    img.save(
+        buffer,
+        format='WEBP',
+        quality=quality,
+        method=method,
+    )
+    return buffer
+
+
+def _save_png_buffer(img, compress_level=6):
+    buffer = io.BytesIO()
+    img.save(
+        buffer,
+        format='PNG',
+        optimize=True,
+        compress_level=compress_level,
+    )
+    return buffer
+
+
+def _compress_jpeg(img, target_bytes, output_path, mode='balanced'):
+    """
+    JPEG anti-Minecraft:
+    - Tidak lagi paksa quality 10.
+    - Resize cerdas dulu berdasarkan target KB.
+    - Quality punya batas bawah agar foto tetap layak dilihat.
+    - Kalau target terlalu kecil, hasil terbaik tetap dibuat + warning.
+    """
+    mode = _normalize_compression_mode(mode)
+    profile = IMAGE_QUALITY_PROFILES[mode]
+    min_quality = profile['jpeg_min_quality']
+    max_quality = 95
+    target_kb = target_bytes / 1024
+
+    fallback = None
+
+    for edge in _candidate_long_edges(img, target_kb, 'JPEG', mode):
+        test_img = _resize_to_long_edge(img, edge)
+
+        low, high = min_quality, max_quality
         best_quality = None
+        best_buffer = None
 
         while low <= high:
             mid = (low + high) // 2
-            buffer = io.BytesIO()
-            test_img.save(buffer, format='JPEG', quality=mid, optimize=True, progressive=True)
+
+            # Saat pencarian, jangan pakai optimize/progressive karena lebih berat CPU.
+            buffer = _save_jpeg_buffer(test_img, mid, optimize=False)
+            size = buffer.tell()
+
+            if size <= target_bytes:
+                best_quality = mid
+                best_buffer = buffer
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        if best_buffer is not None:
+            # Final encode sekali saja dengan optimize=True.
+            # Kualitas sama, ukuran bisa sedikit lebih kecil.
+            final_buffer = _save_jpeg_buffer(test_img, best_quality, optimize=True)
+            with open(output_path, 'wb') as f:
+                f.write(final_buffer.getvalue())
+            return True, best_quality, None
+
+        # Simpan kandidat fallback: ukuran terkecil di quality minimal yang masih layak.
+        min_buffer = _save_jpeg_buffer(test_img, min_quality, optimize=False)
+        if fallback is None or min_buffer.tell() < fallback['size']:
+            fallback = {
+                'img': test_img,
+                'quality': min_quality,
+                'size': min_buffer.tell(),
+            }
+
+    # Target terlalu ekstrem. Jangan hancurkan foto dengan quality 10.
+    final_buffer = _save_jpeg_buffer(fallback['img'], fallback['quality'], optimize=True)
+    with open(output_path, 'wb') as f:
+        f.write(final_buffer.getvalue())
+
+    warning = (
+        'Target KB terlalu kecil untuk foto ini tanpa membuat kualitas turun parah. '
+        'Kompresin menjaga foto tetap jelas, jadi ukuran hasil bisa sedikit di atas target.'
+    )
+    return False, fallback['quality'], warning
+
+
+def _compress_webp(img, target_bytes, output_path, mode='balanced'):
+    """
+    WebP anti-Minecraft:
+    - Tidak lagi fallback quality 10.
+    - method=4 dipakai agar lebih cepat di VPS kecil.
+    - Quality tetap dijaga dengan batas bawah.
+    """
+    mode = _normalize_compression_mode(mode)
+    profile = IMAGE_QUALITY_PROFILES[mode]
+    min_quality = profile['webp_min_quality']
+    max_quality = 95
+    target_kb = target_bytes / 1024
+
+    fallback = None
+
+    for edge in _candidate_long_edges(img, target_kb, 'WEBP', mode):
+        test_img = _resize_to_long_edge(img, edge)
+
+        low, high = min_quality, max_quality
+        best_quality = None
+        best_buffer = None
+
+        while low <= high:
+            mid = (low + high) // 2
+            buffer = _save_webp_buffer(test_img, mid, method=4)
             size = buffer.tell()
 
             if size <= target_bytes:
@@ -134,127 +578,110 @@ def _compress_jpeg(img, target_bytes, output_path):
         if best_buffer is not None:
             with open(output_path, 'wb') as f:
                 f.write(best_buffer.getvalue())
-            return True, best_quality
+            return True, best_quality, None
 
-    # Fallback: aggressive resize + minimum quality
-    fallback_img = img.resize((int(original_width * 0.25), int(original_height * 0.25)), Image.LANCZOS)
-    fallback_img.save(output_path, format='JPEG', quality=10, optimize=True)
-    return False, 10
+        min_buffer = _save_webp_buffer(test_img, min_quality, method=4)
+        if fallback is None or min_buffer.tell() < fallback['size']:
+            fallback = {
+                'buffer': min_buffer,
+                'quality': min_quality,
+                'size': min_buffer.tell(),
+            }
+
+    with open(output_path, 'wb') as f:
+        f.write(fallback['buffer'].getvalue())
+
+    warning = (
+        'Target KB terlalu kecil untuk foto ini tanpa membuat kualitas turun parah. '
+        'Kompresin menjaga foto tetap jelas, jadi ukuran hasil bisa sedikit di atas target.'
+    )
+    return False, fallback['quality'], warning
 
 
-def _compress_png(img, target_bytes, output_path):
+def _compress_png(img, target_bytes, output_path, mode='balanced'):
     """
-    PNG compression: PNG itu lossless, jadi strategi utama = RESIZE.
-    Kita gak punya 'quality' parameter, cuma compress_level (0-9, ngaruh sedikit).
-    
-    Strategy:
-    1. Coba dengan max compression dulu (compress_level=9)
-    2. Kalo masih kegedean, resize bertahap
-    3. Last resort: aggressive resize + quantize ke palette mode (256 colors)
+    PNG anti-rusak:
+    - PNG tidak punya quality seperti JPG/WebP.
+    - Tidak lagi otomatis quantize 256 warna karena bisa bikin warna/bagian halus jelek.
+    - Kalau target terlalu kecil, hasil dibuat lossless/aman walau bisa di atas target.
     """
-    original_width, original_height = img.size
+    mode = _normalize_compression_mode(mode)
+    target_kb = target_bytes / 1024
 
-    for resize_factor in [1.0, 0.85, 0.7, 0.55, 0.4, 0.3]:
-        if resize_factor < 1.0:
-            new_size = (int(original_width * resize_factor), int(original_height * resize_factor))
-            test_img = img.resize(new_size, Image.LANCZOS)
-        else:
-            test_img = img
+    fallback = None
 
-        # Try max compression
-        buffer = io.BytesIO()
-        test_img.save(buffer, format='PNG', optimize=True, compress_level=9)
+    for edge in _candidate_long_edges(img, target_kb, 'PNG', mode):
+        test_img = _resize_to_long_edge(img, edge)
+        buffer = _save_png_buffer(test_img, compress_level=6)
         size = buffer.tell()
 
         if size <= target_bytes:
+            # Final satu kali dengan compress level 9 agar sedikit lebih kecil.
+            final_buffer = _save_png_buffer(test_img, compress_level=9)
             with open(output_path, 'wb') as f:
-                f.write(buffer.getvalue())
-            return True, None  # PNG gak punya 'quality', return None
+                f.write(final_buffer.getvalue())
+            return True, None, None
 
-    # Last resort: quantize ke 256 colors (palette mode) + small resize
-    fallback_img = img.resize((int(original_width * 0.4), int(original_height * 0.4)), Image.LANCZOS)
-    if fallback_img.mode == 'RGBA':
-        fallback_img = fallback_img.quantize(colors=256, method=Image.Quantize.FASTOCTREE)
-    else:
-        fallback_img = fallback_img.convert('P', palette=Image.ADAPTIVE, colors=256)
-    fallback_img.save(output_path, format='PNG', optimize=True, compress_level=9)
-    return False, None
+        if fallback is None or size < fallback['size']:
+            fallback = {
+                'img': test_img,
+                'size': size,
+            }
+
+    final_buffer = _save_png_buffer(fallback['img'], compress_level=9)
+    with open(output_path, 'wb') as f:
+        f.write(final_buffer.getvalue())
+
+    warning = (
+        'PNG sulit dipaksa kecil tanpa mengubah kualitas/warna. '
+        'Kompresin menjaga kualitas PNG, jadi ukuran hasil bisa di atas target. '
+        'Untuk ukuran lebih kecil, pilih output JPG atau WebP.'
+    )
+    return False, None, warning
 
 
-def _compress_webp(img, target_bytes, output_path):
+def compress_to_target_size(image_path, target_kb, output_path, output_format='JPEG', compression_mode='balanced'):
     """
-    WebP compression: mirip JPEG, ada quality parameter (1-100).
-    WebP biasanya lebih efisien 25-35% dibanding JPEG di kualitas yang sama.
-    """
-    original_width, original_height = img.size
+    Dispatcher kompres foto anti-Minecraft.
 
-    for resize_factor in [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
-        if resize_factor < 1.0:
-            new_size = (int(original_width * resize_factor), int(original_height * resize_factor))
-            test_img = img.resize(new_size, Image.LANCZOS)
-        else:
-            test_img = img
-
-        low, high = 10, 95
-        best_buffer = None
-        best_quality = None
-
-        while low <= high:
-            mid = (low + high) // 2
-            buffer = io.BytesIO()
-            test_img.save(buffer, format='WEBP', quality=mid, method=6)
-            size = buffer.tell()
-
-            if size <= target_bytes:
-                best_quality = mid
-                best_buffer = buffer
-                low = mid + 1
-            else:
-                high = mid - 1
-
-        if best_buffer is not None:
-            with open(output_path, 'wb') as f:
-                f.write(best_buffer.getvalue())
-            return True, best_quality
-
-    # Fallback: aggressive resize + min quality
-    fallback_img = img.resize((int(original_width * 0.25), int(original_height * 0.25)), Image.LANCZOS)
-    fallback_img.save(output_path, format='WEBP', quality=10, method=6)
-    return False, 10
-
-
-def compress_to_target_size(image_path, target_kb, output_path, output_format='JPEG'):
-    """
-    Dispatcher: route ke compressor sesuai format output.
-    
-    Args:
-        image_path: path ke file input
-        target_kb: target size dalam KB
-        output_path: path output
-        output_format: 'JPEG', 'PNG', atau 'WEBP'
-    
     Returns:
-        (success: bool, final_size_kb: float, quality: int|None)
+        (on_target: bool, final_size_kb: float, quality: int|None, warning: str|None)
     """
     target_bytes = target_kb * 1024
-    img = Image.open(image_path)
-    img = _prepare_image_for_format(img, output_format)
 
-    # Route ke compressor yang sesuai
+    with Image.open(image_path) as opened:
+        # Biar foto dari HP yang punya EXIF orientation tidak miring.
+        img = ImageOps.exif_transpose(opened)
+        img = _prepare_image_for_format(img, output_format)
+
     if output_format == 'JPEG':
-        success, quality = _compress_jpeg(img, target_bytes, output_path)
+        success, quality, warning = _compress_jpeg(img, target_bytes, output_path, compression_mode)
     elif output_format == 'PNG':
-        success, quality = _compress_png(img, target_bytes, output_path)
+        success, quality, warning = _compress_png(img, target_bytes, output_path, compression_mode)
     elif output_format == 'WEBP':
-        success, quality = _compress_webp(img, target_bytes, output_path)
+        success, quality, warning = _compress_webp(img, target_bytes, output_path, compression_mode)
     else:
         raise ValueError(f"Unsupported output format: {output_format}")
 
     final_size_kb = round(os.path.getsize(output_path) / 1024, 2)
 
-    # Considered "on target" kalo dalam 10% toleransi (PNG khususnya susah hit exact)
-    on_target = final_size_kb <= target_kb * 1.1
-    return on_target, final_size_kb, quality
+    # Dianggap on target kalau masuk toleransi 10%.
+    on_target = success and final_size_kb <= target_kb * 1.1
+    return on_target, final_size_kb, quality, warning
+
+
+
+# ============================================================
+# ROUTES: API (JSON)
+# Gunanya: nanti server/monitoring bisa cek web hidup atau tidak lewat
+# ============================================================
+@app.route('/healthz')
+def healthz():
+    return jsonify({
+        'status': 'ok',
+        'service': 'kompresin',
+    }), 200
+
 
 
 # ============================================================
@@ -481,6 +908,7 @@ def compress_pdf(input_path, output_path, quality='medium'):
 
 
 @app.route('/api/compress-pdf', methods=['POST'])
+@rate_limit(max_requests=6, window_seconds=60)
 def api_compress_pdf():
     """API kompres PDF."""
     if 'file' not in request.files:
@@ -494,9 +922,25 @@ def api_compress_pdf():
     if quality not in ('high', 'medium', 'low'):
         return jsonify({'error': 'Quality gak valid'}), 400
 
+    too_large = reject_if_request_too_large(MAX_PDF_UPLOAD_BYTES, 'PDF')
+    if too_large:
+        return too_large
+
     file_id = str(uuid.uuid4())
     upload_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}.pdf")
     file.save(upload_path)
+
+    if os.path.getsize(upload_path) > MAX_PDF_UPLOAD_BYTES:
+        remove_quietly(upload_path)
+        return jsonify({
+            'error': f'PDF terlalu besar. Maksimal {mb_text(MAX_PDF_UPLOAD_BYTES)}.'
+        }), 413
+
+    if not is_probably_pdf(upload_path):
+        remove_quietly(upload_path)
+        return jsonify({
+            'error': 'File ini tidak terbaca sebagai PDF valid.'
+        }), 400
 
     output_filename = f"{file_id}_compressed.pdf"
     output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
@@ -532,6 +976,7 @@ def api_compress_pdf():
 
 
 @app.route('/api/merge-pdf', methods=['POST'])
+@rate_limit(max_requests=4, window_seconds=60)
 def api_merge_pdf():
     """API gabungin beberapa PDF jadi 1."""
     import pikepdf
@@ -543,6 +988,10 @@ def api_merge_pdf():
     
     if len(files) > 10:
         return jsonify({'error': 'Max 10 file sekaligus'}), 400
+
+    too_large = reject_if_request_too_large(MAX_MERGE_UPLOAD_BYTES, 'Total PDF')
+    if too_large:
+        return too_large
     
     # Validate semua file PDF
     for f in files:
@@ -553,10 +1002,26 @@ def api_merge_pdf():
     file_id = str(uuid.uuid4())
     upload_paths = []
     
+    total_upload_bytes = 0
+
     for idx, f in enumerate(files):
         path = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}_{idx}.pdf")
         f.save(path)
         upload_paths.append(path)
+
+        total_upload_bytes += os.path.getsize(path)
+
+        if total_upload_bytes > MAX_MERGE_UPLOAD_BYTES:
+            cleanup_paths(upload_paths)
+            return jsonify({
+                'error': f'Total PDF terlalu besar. Maksimal {mb_text(MAX_MERGE_UPLOAD_BYTES)}.'
+            }), 413
+
+        if not is_probably_pdf(path):
+            cleanup_paths(upload_paths)
+            return jsonify({
+                'error': f'File "{f.filename}" tidak terbaca sebagai PDF valid.'
+            }), 400
     
     output_filename = f"{file_id}_merged.pdf"
     output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
@@ -602,6 +1067,7 @@ def api_merge_pdf():
 # ROUTES: API Endpoints
 # ============================================================
 @app.route('/api/compress', methods=['POST'])
+@rate_limit(max_requests=20, window_seconds=60)
 def api_compress():
     """
     API kompres foto dengan target size KB.
@@ -631,12 +1097,28 @@ def api_compress():
     if output_format_param not in SUPPORTED_OUTPUT_FORMATS:
         return jsonify({'error': 'Format output gak didukung'}), 400
 
+    too_large = reject_if_request_too_large(MAX_IMAGE_UPLOAD_BYTES, 'Foto')
+    if too_large:
+        return too_large
+
     # === Save uploaded file ===
     file_id = str(uuid.uuid4())
     input_ext = file.filename.rsplit('.', 1)[1].lower()
     upload_filename = f"{file_id}.{input_ext}"
     upload_path = os.path.join(app.config['UPLOAD_FOLDER'], upload_filename)
     file.save(upload_path)
+
+    if os.path.getsize(upload_path) > MAX_IMAGE_UPLOAD_BYTES:
+        remove_quietly(upload_path)
+        return jsonify({
+            'error': f'Foto terlalu besar. Maksimal {mb_text(MAX_IMAGE_UPLOAD_BYTES)}.'
+        }), 413
+
+    if not is_real_image(upload_path):
+        remove_quietly(upload_path)
+        return jsonify({
+            'error': 'File ini tidak terbaca sebagai gambar valid.'
+        }), 400
 
     original_size_kb = round(os.path.getsize(upload_path) / 1024, 2)
 
@@ -655,10 +1137,19 @@ def api_compress():
     output_filename = f"{file_id}_compressed.{output_ext}"
     output_path = os.path.join(app.config['COMPRESSED_FOLDER'], output_filename)
 
+    # === Mode kompresi ===
+    # Untuk sekarang default balanced.
+    # Nanti kalau mau, ini bisa dibuat dropdown: fast / balanced / quality.
+    compression_mode = request.form.get('compression_mode', 'balanced')
+
     # === Eksekusi kompresi ===
     try:
-        success, final_size_kb, quality = compress_to_target_size(
-            upload_path, target_kb, output_path, pil_format
+        success, final_size_kb, quality, warning = compress_to_target_size(
+            upload_path,
+            target_kb,
+            output_path,
+            pil_format,
+            compression_mode
         )
     except Exception as e:
         # Cleanup uploaded file kalo gagal
@@ -686,11 +1177,13 @@ def api_compress():
         'original_size_kb': original_size_kb,
         'final_size_kb': final_size_kb,
         'target_kb': target_kb,
-        'quality_used': quality,  # Bisa None untuk PNG (lossless)
-        'output_format': output_ext,  # NEW: format hasil ('jpg', 'png', 'webp')
+        'quality_used': quality,  # Bisa None untuk PNG
+        'output_format': output_ext,
         'reduction_percent': reduction_percent,
         'download_url': f'/download/{output_filename}',
-        'on_target': success  # Pakai flag dari compressor (lebih akurat)
+        'on_target': success,
+        'compression_mode': compression_mode,
+        'warning': warning
     })
 
 
@@ -782,7 +1275,9 @@ def robots():
 
 @app.errorhandler(413)
 def too_large(e):
-    return jsonify({'error': 'File kegedean (max 5MB)'}), 413
+    return jsonify({
+        'error': 'File terlalu besar. Batas server saat ini 20MB per request.'
+    }), 413
 
 
 # ============================================================
@@ -795,5 +1290,5 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port, use_reloader=False)
+    debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=debug_mode)

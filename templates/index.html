@@ -117,6 +117,26 @@
                             </div>
                         </div>
 
+                        <!-- Compression mode -->
+                        <div class="mb-4">
+                            <label for="compressionMode" class="form-label fw-semibold">Mode Kompresi</label>
+                            <select class="form-select form-select-lg" id="compressionMode">
+                                <option value="fast">Cepat — proses lebih ngebut</option>
+                                <option value="balanced" selected>Seimbang — rekomendasi</option>
+                                <option value="quality">Kualitas Max — lebih jaga detail</option>
+                            </select>
+                            <small class="text-muted d-block mt-2" id="compressionModeHint">
+                                <i class="bi bi-shield-check"></i> Mode Seimbang menjaga hasil tetap jelas dan tidak dipaksa jadi pecah.
+                            </small>
+
+                            <div class="alert alert-warning border-0 mt-3 py-2 px-3 d-none" id="precheckWarning" style="font-size: 0.875rem;">
+                                <div class="fw-semibold mb-1">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Perkiraan awal
+                                </div>
+                                <div id="precheckWarningText"></div>
+                            </div>
+                        </div>
+
                         <!-- Action button -->
                         <button class="btn btn-primary btn-lg w-100" id="compressBtn" disabled>
                             <i class="bi bi-magic"></i> Kompres Sekarang
@@ -148,6 +168,11 @@
                                         <strong id="resultReduction" class="text-primary">-</strong>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="alert alert-warning border-0 d-none" id="qualityWarning">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span id="qualityWarningText"></span>
                             </div>
                             <a id="downloadBtn" class="btn btn-success btn-lg w-100" href="#" download>
                                 <i class="bi bi-download"></i> Download Hasil <span id="resultFormat" class="badge bg-light text-success ms-1"></span>
@@ -185,7 +210,7 @@
                                 <img src="{{ url_for('static', filename='images/icons/icon-pas-foto.svg') }}" 
                                     alt="Pas Foto" width="48" height="48">
                             </div>
-                            <h5 class="fw-semibold text-dark">Pas Foto Maker</h5>
+                            <h5 class="fw-semibold text-dark">Pas Foto Maker AI</h5>
                             <p class="text-muted small mb-0">Ukuran 2x3, 3x4, 4x6. Background merah/biru/putih.</p>
                             <span class="badge bg-success-soft text-success mt-3">Ready</span>
                         </div>
@@ -201,7 +226,7 @@
                                 <i class="bi bi-palette text-info"></i>
                             </div>
                             <h5 class="fw-semibold text-dark">Ganti Background</h5>
-                            <p class="text-muted small mb-0">Pilih warna baru. AI auto remove (segera hadir).</p>
+                            <p class="text-muted small mb-0">Pilih warna baru. AI auto remove.</p>
                             <span class="badge bg-success-soft text-success mt-3">Ready</span>
                         </div>
                     </div>
