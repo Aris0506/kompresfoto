@@ -291,6 +291,73 @@ async function loadModel() {
     }
 }
 
+
+async function loadImageElementFromFile(file) {
+    const url = URL.createObjectURL(file);
+
+    try {
+        const img = new Image();
+        img.decoding = 'async';
+
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = url;
+        });
+
+        return img;
+    } finally {
+        URL.revokeObjectURL(url);
+    }
+}
+
+async function loadOptimizedRawImage(file, maxLongEdge = 2200) {
+    const img = await loadImageElementFromFile(file);
+
+    const originalW = img.naturalWidth || img.width;
+    const originalH = img.naturalHeight || img.height;
+    const longEdge = Math.max(originalW, originalH);
+
+    if (longEdge <= maxLongEdge) {
+        const imageUrl = URL.createObjectURL(file);
+        try {
+            return await RawImage.fromURL(imageUrl);
+        } finally {
+            URL.revokeObjectURL(imageUrl);
+        }
+    }
+
+    const scale = maxLongEdge / longEdge;
+    const targetW = Math.round(originalW * scale);
+    const targetH = Math.round(originalH * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW;
+    canvas.height = targetH;
+
+    const ctx = canvas.getContext('2d', {
+        alpha: false,
+        willReadFrequently: true,
+    });
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, targetW, targetH);
+
+    const blob = await new Promise((resolve) => {
+        canvas.toBlob(resolve, 'image/jpeg', 0.95);
+    });
+
+    const resizedUrl = URL.createObjectURL(blob);
+
+    try {
+        console.log('[GantiBg] Resized image:', originalW, 'x', originalH, '→', targetW, 'x', targetH);
+        return await RawImage.fromURL(resizedUrl);
+    } finally {
+        URL.revokeObjectURL(resizedUrl);
+    }
+}
+
 // =====================
 // Process Image
 // =====================
@@ -298,9 +365,7 @@ async function processImage(file) {
     showState('processing');
     
     try {
-        const imageUrl = URL.createObjectURL(file);
-        const image = await RawImage.fromURL(imageUrl);
-        URL.revokeObjectURL(imageUrl);
+        const image = await loadOptimizedRawImage(file, 2200);
         
         console.log('[GantiBg] Image:', image.width, 'x', image.height);
         
