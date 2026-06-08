@@ -23,21 +23,21 @@ app = Flask(__name__)
 
 # Request hard limit.
 # UI kamu sekarang:
-# - Foto max 5MB
-# - Kompres PDF max 15MB
-# - Merge PDF max 15MB total
+# - Foto max 10MB
+# - Kompres PDF max 20MB
+# - Merge PDF max 20MB total
 #
-# Kita kasih 20MB agar multipart/form-data masih punya sedikit overhead.
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
+# Kita kasih 30MB agar multipart/form-data masih punya sedikit overhead.
+app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['COMPRESSED_FOLDER'] = 'compressed'
 
-# Batas upload per fitur. Ini tidak mengubah kualitas hasil.
-# Ini cuma melindungi server kecil agar tidak disiksa file terlalu besar.
-MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024
-MAX_PDF_UPLOAD_BYTES = 15 * 1024 * 1024
-MAX_MERGE_UPLOAD_BYTES = 15 * 1024 * 1024
+# Batas upload per fitur.
+# Dibuat cukup lega, tapi tetap aman untuk VPS kecil.
+MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024
+MAX_PDF_UPLOAD_BYTES = 20 * 1024 * 1024
+MAX_MERGE_UPLOAD_BYTES = 20 * 1024 * 1024
 
 # File hasil yang tidak didownload akan dibersihkan otomatis.
 FILE_TTL_SECONDS = int(os.environ.get('FILE_TTL_SECONDS', 60 * 60))  # default 1 jam
@@ -1276,7 +1276,7 @@ def robots():
 @app.errorhandler(413)
 def too_large(e):
     return jsonify({
-        'error': 'File terlalu besar. Batas server saat ini 20MB per request.'
+        'error': 'File terlalu besar. Batas server saat ini 30MB per request.'
     }), 413
 
 

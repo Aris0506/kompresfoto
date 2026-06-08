@@ -13,7 +13,9 @@ import {
 
 // Config Transformers.js
 env.allowLocalModels = false;
-env.useBrowserCache = true; // cache model di IndexedDB browser
+env.useBrowserCache =
+    window.isSecureContext ||
+    ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 
 // =====================
 // DOM Elements
@@ -23,7 +25,9 @@ const selectFileBtn = document.getElementById('selectFileBtn');
 const fileInput = document.getElementById('fileInput');
 const aiLoadingState = document.getElementById('aiLoadingState');
 const aiProgressBar = document.getElementById('aiProgressBar');
+const aiLoadingTitle = document.getElementById('aiLoadingTitle');
 const aiLoadingDetail = document.getElementById('aiLoadingDetail');
+const aiLoadingSubDetail = document.getElementById('aiLoadingSubDetail');
 const processingState = document.getElementById('processingState');
 const previewState = document.getElementById('previewState');
 const previewCanvas = document.getElementById('previewCanvas');
@@ -78,10 +82,104 @@ function showError(msg) {
     console.error('[PasFoto Error]', msg);
 }
 
-function updateProgress(percent, detail) {
-    aiProgressBar.style.width = percent + '%';
-    aiProgressBar.textContent = Math.round(percent) + '%';
-    if (detail) aiLoadingDetail.textContent = detail;
+function formatModelBytes(bytes) {
+    if (!bytes || Number.isNaN(bytes)) return '';
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(1)}MB`;
+}
+
+function friendlyModelFileName(filename) {
+    if (!filename) return 'file model AI';
+
+    const lower = filename.toLowerCase();
+
+    if (lower.includes('model') && lower.includes('onnx')) {
+        return 'mesin utama AI';
+    }
+
+    if (lower.includes('config')) {
+        return 'konfigurasi AI';
+    }
+
+    if (lower.includes('preprocessor') || lower.includes('processor')) {
+        return 'pemroses gambar';
+    }
+
+    if (lower.includes('tokenizer')) {
+        return 'data pendukung AI';
+    }
+
+    return 'data model AI';
+}
+
+function updateProgress(percent, detail, subDetail) {
+    const safePercent = Math.max(0, Math.min(100, Number.isFinite(percent) ? percent : 0));
+
+    aiProgressBar.style.width = safePercent + '%';
+    aiProgressBar.textContent = Math.round(safePercent) + '%';
+    aiProgressBar.setAttribute('aria-valuenow', Math.round(safePercent));
+
+    if (detail && aiLoadingDetail) {
+        aiLoadingDetail.textContent = detail;
+    }
+
+    if (subDetail && aiLoadingSubDetail) {
+        aiLoadingSubDetail.textContent = subDetail;
+    }
+}
+
+function handleModelProgress(progress) {
+    if (!progress) return;
+
+    const fileLabel = friendlyModelFileName(progress.file);
+
+    if (progress.status === 'initiate') {
+        updateProgress(
+            3,
+            `Menyiapkan ${fileLabel}...`,
+            'Sebentar lagi proses download dimulai.'
+        );
+        return;
+    }
+
+    if (progress.status === 'download') {
+        updateProgress(
+            8,
+            `Mulai download ${fileLabel}...`,
+            'Ini hanya diperlukan saat pertama kali atau setelah cache browser dibersihkan.'
+        );
+        return;
+    }
+
+    if (progress.status === 'progress') {
+        let percent = 20;
+
+        if (progress.total && progress.loaded) {
+            percent = (progress.loaded / progress.total) * 90;
+        }
+
+        const loadedText = formatModelBytes(progress.loaded);
+        const totalText = formatModelBytes(progress.total);
+
+        const subDetail = loadedText && totalText
+            ? `Terunduh ${loadedText} dari ${totalText}. Jangan tutup tab ini.`
+            : 'Sedang mengunduh model AI. Jangan tutup tab ini.';
+
+        updateProgress(
+            percent,
+            `Download ${fileLabel}...`,
+            subDetail
+        );
+        return;
+    }
+
+    if (progress.status === 'done') {
+        updateProgress(
+            95,
+            `${fileLabel} selesai dimuat.`,
+            'Sedikit lagi, AI sedang disiapkan untuk memproses foto.'
+        );
+    }
 }
 
 // =====================
@@ -91,7 +189,16 @@ async function loadModel() {
     if (isModelLoaded) return true;
     
     showState('aiLoading');
-    updateProgress(0, 'Mempersiapkan AI model...');
+
+    if (aiLoadingTitle) {
+        aiLoadingTitle.textContent = 'Menyiapkan AI di browser...';
+    }
+
+    updateProgress(
+        0,
+        'Pertama kali butuh download model AI. Setelah itu biasanya tersimpan di browser.',
+        'Ukuran model sekitar 45MB. Kecepatan tergantung koneksi dan perangkat kamu.'
+    );
     
     try {
         const modelId = 'briaai/RMBG-1.4';
@@ -99,14 +206,7 @@ async function loadModel() {
         // Load model with progress callback
         aiModel = await AutoModel.from_pretrained(modelId, {
             quantized: true, // 8-bit quantized (~45MB)
-            progress_callback: (progress) => {
-                if (progress.status === 'progress') {
-                    const percent = (progress.loaded / progress.total) * 100;
-                    updateProgress(percent, `Loading: ${progress.file} (${Math.round(percent)}%)`);
-                } else if (progress.status === 'done') {
-                    updateProgress(95, `Loaded: ${progress.file}`);
-                }
-            }
+            progress_callback: handleModelProgress
         });
         
         // Load processor (config preset for RMBG-1.4)
@@ -125,7 +225,16 @@ async function loadModel() {
             }
         });
         
-        updateProgress(100, 'AI model siap!');
+        if (aiLoadingTitle) {
+            aiLoadingTitle.textContent = 'AI siap dipakai!';
+        }
+
+        updateProgress(
+            100,
+            'AI model siap. Foto akan segera diproses.',
+            'Untuk pemakaian berikutnya, loading biasanya lebih cepat karena model tersimpan di browser.'
+        );
+
         isModelLoaded = true;
         console.log('[PasFoto] Model loaded successfully');
         return true;
@@ -164,9 +273,33 @@ async function processImage(file) {
             output[0].mul(255).to('uint8')
         ).resize(image.width, image.height);
         
-        // Combine original RGB + mask alpha
-        const result = mergeImageAndMask(image, mask);
-        currentImage = result;
+        // Bersihkan mask AI agar bercak background berkurang dan tepi lebih halus.
+        const refinedMask = refineMask(mask, {
+            foregroundThreshold: 26,
+            backgroundThreshold: 18,
+            minIslandRatio: 0.00022,
+            maxHoleRatio: 0.00045,
+            blurPasses: 1,
+
+            keepMainSubject: true,
+            subjectBandTop: 0.12,
+            subjectBandBottom: 0.98,
+        });
+
+        // Combine original RGB + refined mask alpha
+        const result = mergeImageAndMask(image, refinedMask);
+
+        // Pas foto dibuat lebih lembut supaya rambut/wajah tetap natural.
+        const cleanedResult = despillEdgeColors(result, {
+            transparentThreshold: 16,
+            solidAlpha: 238,
+            neighborRadius: 1,
+            baseBlend: 0.22,
+            greenStrength: 0.42,
+            protectSkin: true,
+        });
+
+        currentImage = cleanedResult;
         
         // Render to canvas
         renderToCanvas(result);
@@ -180,6 +313,329 @@ async function processImage(file) {
         showState('upload');
     }
 }
+
+// =====================
+// AI Mask Cleanup + Edge Smoothing
+// =====================
+
+function clampByte(value) {
+    return Math.max(0, Math.min(255, Math.round(value)));
+}
+
+function softenMaskAlpha(alpha, w, h, passes = 1) {
+    let src = alpha;
+
+    for (let pass = 0; pass < passes; pass++) {
+        const dst = new Uint8ClampedArray(src.length);
+
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                let sum = 0;
+                let weight = 0;
+
+                for (let dy = -1; dy <= 1; dy++) {
+                    const yy = y + dy;
+                    if (yy < 0 || yy >= h) continue;
+
+                    for (let dx = -1; dx <= 1; dx++) {
+                        const xx = x + dx;
+                        if (xx < 0 || xx >= w) continue;
+
+                        const idx = yy * w + xx;
+                        const centerWeight = dx === 0 && dy === 0 ? 4 : 1;
+
+                        sum += src[idx] * centerWeight;
+                        weight += centerWeight;
+                    }
+                }
+
+                dst[y * w + x] = clampByte(sum / weight);
+            }
+        }
+
+        src = dst;
+    }
+
+    return src;
+}
+
+function removeTinyForegroundIslands(alpha, w, h, options = {}) {
+    const foregroundThreshold = options.foregroundThreshold ?? 28;
+    const minIslandRatio = options.minIslandRatio ?? 0.00035;
+    const minIslandPixels = Math.max(24, Math.floor(w * h * minIslandRatio));
+
+    const visited = new Uint8Array(w * h);
+    const cleaned = new Uint8ClampedArray(alpha);
+    const queue = [];
+
+    const neighbors = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+    ];
+
+    for (let start = 0; start < alpha.length; start++) {
+        if (visited[start] || alpha[start] <= foregroundThreshold) {
+            continue;
+        }
+
+        let head = 0;
+        queue.length = 0;
+        queue.push(start);
+        visited[start] = 1;
+
+        const component = [start];
+
+        while (head < queue.length) {
+            const current = queue[head++];
+            const x = current % w;
+            const y = Math.floor(current / w);
+
+            for (const [dx, dy] of neighbors) {
+                const nx = x + dx;
+                const ny = y + dy;
+
+                if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+
+                const next = ny * w + nx;
+
+                if (visited[next] || alpha[next] <= foregroundThreshold) {
+                    continue;
+                }
+
+                visited[next] = 1;
+                queue.push(next);
+                component.push(next);
+            }
+        }
+
+        if (component.length < minIslandPixels) {
+            for (const idx of component) {
+                cleaned[idx] = 0;
+            }
+        }
+    }
+
+    return cleaned;
+}
+
+function stabilizeMask(alpha, w, h) {
+    const stable = new Uint8ClampedArray(alpha.length);
+
+    for (let i = 0; i < alpha.length; i++) {
+        const value = alpha[i];
+
+        // Area hampir transparan dibuang agar bercak background hilang.
+        if (value < 18) {
+            stable[i] = 0;
+        }
+        // Area yang sudah jelas objek dibuat solid.
+        else if (value > 238) {
+            stable[i] = 255;
+        }
+        // Area pinggir tetap dipertahankan agar smoothing masih natural.
+        else {
+            stable[i] = value;
+        }
+    }
+
+    return stable;
+}
+
+function refineMask(mask, options = {}) {
+    const w = mask.width;
+    const h = mask.height;
+
+    let alpha = new Uint8ClampedArray(mask.data);
+
+    // 1. Buang alpha super tipis.
+    alpha = stabilizeMask(alpha, w, h);
+
+    // 2. Hapus bercak foreground kecil yang biasanya berasal dari background rame.
+    alpha = removeTinyForegroundIslands(alpha, w, h, {
+        foregroundThreshold: options.foregroundThreshold ?? 28,
+        minIslandRatio: options.minIslandRatio ?? 0.00028,
+    });
+
+    // 3. Haluskan tepi supaya tidak kotak-kotak.
+    alpha = softenMaskAlpha(alpha, w, h, options.blurPasses ?? 1);
+
+    // 4. Rapikan lagi setelah blur agar background tidak berkabut.
+    for (let i = 0; i < alpha.length; i++) {
+        if (alpha[i] < 10) alpha[i] = 0;
+        if (alpha[i] > 245) alpha[i] = 255;
+    }
+
+    return {
+        width: w,
+        height: h,
+        data: alpha,
+    };
+}
+
+
+
+// =====================
+// Edge Despill / Color Decontamination
+// =====================
+
+function isSkinLike(r, g, b) {
+    return (
+        r > 95 &&
+        g > 40 &&
+        b > 20 &&
+        r > g &&
+        r > b &&
+        (Math.max(r, g, b) - Math.min(r, g, b)) > 12
+    );
+}
+
+function hasTransparentNeighborRGBA(rgba, x, y, w, h, threshold = 18) {
+    for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+
+            const nx = x + dx;
+            const ny = y + dy;
+
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
+                return true;
+            }
+
+            const idx = (ny * w + nx) * 4;
+            const a = rgba[idx + 3];
+
+            if (a <= threshold) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function sampleSolidNeighborColor(rgba, x, y, w, h, options = {}) {
+    const radius = options.radius ?? 2;
+    const solidAlpha = options.solidAlpha ?? 235;
+
+    let sumR = 0;
+    let sumG = 0;
+    let sumB = 0;
+    let weightTotal = 0;
+
+    for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+            const nx = x + dx;
+            const ny = y + dy;
+
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+            if (dx === 0 && dy === 0) continue;
+
+            const idx = (ny * w + nx) * 4;
+            const a = rgba[idx + 3];
+
+            if (a < solidAlpha) continue;
+
+            const distance = Math.abs(dx) + Math.abs(dy);
+            const weight = 1 / (distance + 0.35);
+
+            sumR += rgba[idx] * weight;
+            sumG += rgba[idx + 1] * weight;
+            sumB += rgba[idx + 2] * weight;
+            weightTotal += weight;
+        }
+    }
+
+    if (!weightTotal) return null;
+
+    return {
+        r: sumR / weightTotal,
+        g: sumG / weightTotal,
+        b: sumB / weightTotal,
+    };
+}
+
+function softenGreenSpill(r, g, b, strength = 0.65) {
+    const maxRB = Math.max(r, b);
+
+    if (g > maxRB + 8 && g > r * 1.04 && g > b * 1.04) {
+        const cappedG = maxRB + 6;
+        g = cappedG + (g - cappedG) * (1 - strength);
+    }
+
+    return [r, g, b];
+}
+
+function despillEdgeColors(imageData, options = {}) {
+    const w = imageData.width;
+    const h = imageData.height;
+
+    const src = new Uint8ClampedArray(imageData.data);
+    const dst = imageData.data;
+
+    const transparentThreshold = options.transparentThreshold ?? 18;
+    const solidAlpha = options.solidAlpha ?? 235;
+    const neighborRadius = options.neighborRadius ?? 2;
+    const baseBlend = options.baseBlend ?? 0.34;
+    const greenStrength = options.greenStrength ?? 0.68;
+    const protectSkin = options.protectSkin ?? true;
+
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            const idx = (y * w + x) * 4;
+
+            const a = src[idx + 3];
+            if (a === 0) continue;
+
+            const nearTransparency = hasTransparentNeighborRGBA(
+                src,
+                x,
+                y,
+                w,
+                h,
+                transparentThreshold
+            );
+
+            const isEdgePixel = a < solidAlpha || nearTransparency;
+
+            if (!isEdgePixel) continue;
+
+            let r = src[idx];
+            let g = src[idx + 1];
+            let b = src[idx + 2];
+
+            const neighbor = sampleSolidNeighborColor(src, x, y, w, h, {
+                radius: neighborRadius,
+                solidAlpha,
+            });
+
+            if (neighbor) {
+                const alphaFactor = 1 - Math.min(1, a / solidAlpha);
+
+                let blend = baseBlend + alphaFactor * 0.42;
+                if (nearTransparency) blend += 0.08;
+
+                blend = Math.max(0.18, Math.min(0.82, blend));
+
+                r = r * (1 - blend) + neighbor.r * blend;
+                g = g * (1 - blend) + neighbor.g * blend;
+                b = b * (1 - blend) + neighbor.b * blend;
+            }
+
+            if (!(protectSkin && isSkinLike(r, g, b))) {
+                [r, g, b] = softenGreenSpill(r, g, b, greenStrength);
+            }
+
+            dst[idx] = Math.max(0, Math.min(255, Math.round(r)));
+            dst[idx + 1] = Math.max(0, Math.min(255, Math.round(g)));
+            dst[idx + 2] = Math.max(0, Math.min(255, Math.round(b)));
+        }
+    }
+
+    return imageData;
+}
+
 
 // =====================
 // Helper: Merge RGB + Mask jadi RGBA

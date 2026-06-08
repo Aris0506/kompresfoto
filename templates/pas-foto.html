@@ -81,16 +81,43 @@
                         </div>
 
                         <!-- STATE 2: AI Loading (first time only) -->
-                        <div id="aiLoadingState" class="d-none text-center py-4">
-                            <div class="spinner-border text-primary mb-3" role="status"></div>
-                            <h5>🤖 AI sedang loading (sekali aja)...</h5>
-                            <p class="text-muted mb-3" id="aiLoadingDetail">Persiapan model: ~45MB, cached after download</p>
-                            <div class="progress" style="height: 24px;">
-                                <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
-                                     role="progressbar" style="width: 0%">0%</div>
+                        <div id="aiLoadingState" class="d-none py-4">
+                            <div class="text-center mb-3">
+                                <div class="spinner-border text-primary mb-3" role="status"></div>
+                                <h5 class="mb-2" id="aiLoadingTitle">Menyiapkan AI di browser...</h5>
+                                <p class="text-muted mb-0" id="aiLoadingDetail">
+                                    Pertama kali butuh download model AI. Setelah itu biasanya tersimpan di browser.
+                                </p>
                             </div>
-                            <small class="text-muted d-block mt-3" id="aiLoadingTip">
-                                💡 Tip: Background merah = lahir tahun ganjil (SSCASN)
+
+                            <div class="progress mb-2" style="height: 26px;">
+                                <div id="aiProgressBar"
+                                    class="progress-bar progress-bar-striped progress-bar-animated"
+                                    role="progressbar"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    aria-valuenow="0"
+                                    style="width: 0%">
+                                    0%
+                                </div>
+                            </div>
+
+                            <div class="small text-muted text-center mb-3" id="aiLoadingSubDetail">
+                                Ukuran model sekitar 45MB. Kecepatan tergantung koneksi dan perangkat kamu.
+                            </div>
+
+                            <div class="alert alert-info border-0 mb-0" style="font-size: 0.9rem;">
+                                <div class="fw-semibold mb-1">
+                                    <i class="bi bi-shield-check"></i> Foto tetap aman
+                                </div>
+                                <div>
+                                    Proses AI berjalan di browser kamu. Foto tidak diupload ke server Kompresin.
+                                    Jangan tutup tab ini sampai proses selesai.
+                                </div>
+                            </div>
+
+                            <small class="text-muted d-block mt-3 text-center" id="aiLoadingTip">
+                                💡 Tip: Background merah sering dipakai untuk tahun lahir ganjil, biru untuk genap.
                             </small>
                         </div>
 
